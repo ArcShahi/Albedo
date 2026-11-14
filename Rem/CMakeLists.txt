@@ -9,8 +9,10 @@ add_library(rem)
 
 target_sources(rem 
         PRIVATE 
-        src/test.cpp
-
+        src/Window.cpp
+        src/Layer.cpp
+        src/App.cpp
+   
         
 
         # Headers TODO biatch
@@ -18,9 +20,14 @@ target_sources(rem
           FILE_SET HEADERS 
           BASE_DIRS include 
              FILES
-             include/Rem/test.hpp
+             include/Rem/Window.hpp
+             include/Rem/Event.hpp
+             include/Rem/InputEvents.hpp
+             include/Rem/WindowEvents.hpp
+             include/Rem/Layer.hpp
+             include/Rem/App.hpp
+)
 
- )
 
 include(dependencies.cmake)
 add_subdirectory(vendors/glad)
