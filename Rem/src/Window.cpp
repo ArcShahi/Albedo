@@ -5,7 +5,6 @@
 #include <Rem/Window.hpp>
 #include <Rem/WindowEvents.hpp>
 
-#include <glad/glad.h>
 #include <glm/vec2.hpp>
 
 namespace Rem {
@@ -130,6 +129,7 @@ glm::vec2 Window::GetFrameBufferSize() const noexcept {
 glm::vec2 Window::GetMousePosition() const noexcept { 
      double x, y;
   glfwGetCursorPos(handle_, &x, &y);
+     return {static_cast<float>(x), static_cast<float>(y)};
 }
 
 bool Window::ShouldClose() const noexcept {
