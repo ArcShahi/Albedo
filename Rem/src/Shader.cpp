@@ -25,8 +25,8 @@ uint32_t Shader::CompileShader_(uint32_t type,
   if (!success) {
     int errlen{0};
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &success);
-    std::string infoLog(errlen, '.');
-    glGetProgramInfoLog(id, errlen, nullptr, &infoLog[0]);
+    std::string infoLog(errlen, '0');
+    glGetProgramInfoLog(id, errlen, nullptr, infoLog.data());
     std::cerr << "\nERROR: Linking shader program failed\n" << infoLog << '\n';
     return -1;
   }
@@ -51,8 +51,8 @@ Shader::CreateShader_(const std::string &vertexShader,
   if (!success) {
     int errlen{0};
     glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &errlen);
-    std::string infoLog(errlen, '.');
-    glGetProgramInfoLog(handle, errlen, nullptr, &infoLog[0]);
+    std::string infoLog(errlen, '0');
+    glGetProgramInfoLog(handle, errlen, nullptr, infoLog.data());
     std::cerr << "\nERROR: Linking shader program failed\n" << infoLog << '\n';
     return -1;
   }
