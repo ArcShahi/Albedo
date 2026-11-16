@@ -32,7 +32,7 @@ public:
 
   template <typename TLayer>
     requires(std::is_base_of_v<Layer, TLayer>)
-  void PushLayer() {
+    void PushLayer() {
     layerStack_.push_back(std::make_unique<TLayer>());
   }
 
@@ -46,7 +46,7 @@ public:
     return nullptr;
   }
 
-  [[nodicard]] glm::vec2 GetFramebufferSize() const;
+  [[nodiscard]] glm::vec2 GetFramebufferSize() const;
 
   [[nodiscard]] std::shared_ptr<Window> GetWindow() const { return window_; }
 

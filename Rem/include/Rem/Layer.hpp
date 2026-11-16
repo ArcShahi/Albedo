@@ -12,8 +12,8 @@ class Layer {
 public:
   virtual ~Layer() = default;
 
-  virtual void OnEvent(Event &event) {}
-  virtual void OnUpdate(float ts) {}
+  virtual void OnEvent([[maybe_unused]] Event &event) {}
+  virtual void OnUpdate([[maybe_unused]] float ts) {}
   virtual void OnRender() {}
 
   template <std::derived_from<Layer> T, typename... Args>

@@ -45,7 +45,7 @@ public:
 
 	   template <typename T> bool Dispatch(EventFunc<T> func) {
           if (event_.GetEventType() == T::GetStaticType() && !event_.handled) {
-               event_.handled = func(*(T *)&event_);
+               event_.handled = func(static_cast<T &>(event_));
             return true;
           }
           return false;
