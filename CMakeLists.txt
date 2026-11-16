@@ -24,8 +24,23 @@ add_subdirectory(Rem)
 
 target_compile_features(albedo PUBLIC cxx_std_23)
 
-# Enable Multiprocessor compilation for MSVC 
-target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
+# MSVC FLags
+target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP;/W4;/Ox;/WX;/permissive>)
+
+# CLANG FLAGS
+set(CLANG_FLAGS
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wshadow
+    -Wold-style-cast
+    -Wunused
+    -Wconversion
+    -Wsign-conversion
+    -Wdouble-promotion
+    -Werror)
+
+target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:Clang>:${CLANG_FLAGS}>)
 # Remove console if wanted 
 
 # Link libraries

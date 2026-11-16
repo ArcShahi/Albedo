@@ -12,6 +12,9 @@ target_sources(rem
         src/Window.cpp
         src/Layer.cpp
         src/App.cpp
+        src/Renderer.cpp
+        src/FrameBuffer.cpp
+        src/Shader.cpp
    
         
 
@@ -26,6 +29,9 @@ target_sources(rem
              include/Rem/WindowEvents.hpp
              include/Rem/Layer.hpp
              include/Rem/App.hpp
+             include/Rem/Renderer/Renderer.hpp
+             include/Rem/Renderer/FrameBuffer.hpp
+             include/Rem/Renderer/Shader.hpp
 )
 
 
