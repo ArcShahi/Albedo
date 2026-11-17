@@ -7,9 +7,9 @@ uniform float uTime;
 
 void main(){
 
-     //float fade= sin(uTime)/2.0+0.5f;
+     float fade= sin(uTime)/2.0+0.5f;
      vec4 TextColor=texture(uTexture,vUv);
-	//textColor*=fade;
+	TextColor*=fade;
 	//textColor=textColor*vec4(0.0,0.0,1.0,1.0);
      FragColor = TextColor;
 }

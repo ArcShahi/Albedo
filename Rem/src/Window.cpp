@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include <Rem/InputEvents.hpp>
+#include <Rem/Utils.hpp>
 #include <Rem/Window.hpp>
 #include <Rem/WindowEvents.hpp>
 
@@ -21,6 +22,7 @@ void Window::Create() noexcept {
 
   handle_ = glfwCreateWindow(specs_.width, specs_.height, specs_.title.c_str(),
                              nullptr, nullptr);
+  SetDarkTitleBar(handle_, true);
 
   if (!handle_) {
     std::cerr << "Failed to create GLFW window!\n";

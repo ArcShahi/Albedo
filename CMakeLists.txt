@@ -9,7 +9,7 @@ add_executable(albedo)
 
 target_sources(albedo 
         PRIVATE 
-        src/main.cpp
+        src/Main.cpp
         src/Scene.cpp
         
         

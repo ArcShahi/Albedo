@@ -14,9 +14,7 @@ target_sources(rem
         src/Renderer.cpp
         src/FrameBuffer.cpp
         src/Shader.cpp
-   
-        
-
+     
         # Headers TODO biatch
         PUBLIC  
           FILE_SET HEADERS 
@@ -35,6 +33,7 @@ target_sources(rem
              include/Rem/Renderer/VertexArray.hpp
              include/Rem/Renderer/IndexBuffer.hpp
              include/Rem/Renderer/Common.hpp
+             include/Rem/Utils.hpp
 )
 
 
@@ -52,5 +51,8 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 
 # Link libraries
 target_link_libraries(rem PUBLIC glm::glm glfw glad stb)
+# liknk dwampi( what a name) for windows...
+target_link_libraries(rem PUBLIC $<$<PLATFORM_ID:Windows>:dwmapi>)
+
 
 
