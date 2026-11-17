@@ -47,7 +47,7 @@ void App::Run() noexcept {
 
     // Can use another thread to render
     for (const auto &layer : layerStack_) {
-      layer->OnUIRender();
+      layer->OnRender();
     }
     window_->Update();
 
@@ -81,7 +81,7 @@ void App::Init() {
   glfwInit();
 
   specs_.windowSpecs.eventCallback = [this](Event &event) {
-    RaiseEvent(event);
+    RaiseEvent(event); 
   };
 
   window_ = std::make_shared<Window>(specs_.windowSpecs);

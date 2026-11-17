@@ -1,4 +1,4 @@
-#include <Rem/Renderer/FrameBuffer.hpp>
+/*#include <Rem/Renderer/FrameBuffer.hpp>
 
 #include <iostream>
 #include <stb_image.h>
@@ -8,6 +8,7 @@ namespace Rem {
  FrameBuffer CreateFramebufferWithTexture(const Texture texture) {
 
   FrameBuffer fb;
+
   glCreateFramebuffers(1, &fb.handle);
 
   if (!AttachTextureToFramebuffer(fb, texture)) {
@@ -43,4 +44,4 @@ void BlitFramebufferToSwapchain(const FrameBuffer framebuffer) noexcept {
                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
-} // namespace Rem
+} // namespace Rem*/

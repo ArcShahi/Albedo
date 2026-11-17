@@ -10,12 +10,15 @@ add_executable(albedo)
 target_sources(albedo 
         PRIVATE 
         src/main.cpp
+        src/Scene.cpp
+        
         
         # Headers TODO biatch
         PRIVATE 
           FILE_SET HEADERS 
           BASE_DIRS include 
              FILES
+          include/Scene.hpp
 
  )
 
@@ -42,6 +45,12 @@ set(CLANG_FLAGS
 
 target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:Clang>:${CLANG_FLAGS}>)
 # Remove console if wanted 
+
+# Path to assets and shader as compiler definition
+
+target_compile_definitions(albedo PRIVATE ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+target_compile_definitions(albedo PRIVATE SHADERS="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
+
 
 # Link libraries
 target_link_libraries(albedo PRIVATE rem)

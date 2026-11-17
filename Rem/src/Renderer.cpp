@@ -1,6 +1,8 @@
 #include <Rem/Renderer/Renderer.hpp>
 #include <stb_image.h>
 
+#include <cassert>
+
 namespace Rem {
 
 Texture::Texture(const std::string &path) : filepath_{path} {
@@ -32,6 +34,7 @@ Texture::Texture(const std::string &path) : filepath_{path} {
     data_ = nullptr;
   }
 }
+
 
 Texture::~Texture() { glDeleteTextures(1, &handle_); }
 

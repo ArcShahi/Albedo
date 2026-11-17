@@ -16,7 +16,7 @@ public:
   virtual void OnDetach() {}
   virtual void OnEvent([[maybe_unused]] Event &event) {}
   virtual void OnUpdate([[maybe_unused]] float ts) {}
-  virtual void OnUIRender() {}
+  virtual void OnRender() {}
 
 };
 

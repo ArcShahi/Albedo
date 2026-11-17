@@ -5,7 +5,7 @@
 namespace Rem {
 
 struct FrameBuffer {
-  Texture colorAttachment{};
+  Texture colorAttachment;
   uint32_t handle{0};
 };
 

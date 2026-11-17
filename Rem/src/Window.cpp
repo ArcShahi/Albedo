@@ -37,6 +37,12 @@ void Window::Create() noexcept {
   glfwSwapInterval(specs_.vsync ? 1 : 0);
   glfwSetWindowUserPointer(handle_, this);
 
+  // Set Viewport size
+  glfwSetFramebufferSizeCallback(handle_,
+                                 [](GLFWwindow *, int width, int height) {
+                                   glViewport(0, 0, width, height);
+                                 });
+
   glfwSetWindowCloseCallback(handle_, [](GLFWwindow *hnd) {
     Window &window{*((Window *)glfwGetWindowUserPointer(hnd))};
     WindowClosedEvent event{};
@@ -126,10 +132,10 @@ glm::vec2 Window::GetFrameBufferSize() const noexcept {
   return {static_cast<float>(w), static_cast<float>(h)};
 }
 
-glm::vec2 Window::GetMousePosition() const noexcept { 
-     double x, y;
+glm::vec2 Window::GetMousePosition() const noexcept {
+  double x, y;
   glfwGetCursorPos(handle_, &x, &y);
-     return {static_cast<float>(x), static_cast<float>(y)};
+  return {static_cast<float>(x), static_cast<float>(y)};
 }
 
 bool Window::ShouldClose() const noexcept {

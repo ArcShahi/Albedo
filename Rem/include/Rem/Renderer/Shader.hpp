@@ -13,9 +13,12 @@ namespace Rem {
 class Shader {
 
 public:
-  Shader(const char *vertexPath, const char *shaderPath);
+  Shader() {};
 
+  void Init(const std::string &vertexPath,
+            const std::string &shaderPath) noexcept;
   void Use() const noexcept;
+ 
   void Reload(const char *vs, const char *fs) noexcept;
   // Sets the value of uniform vec4
   void SetUniform(const char *name, glm::vec4 val) const noexcept;
@@ -26,6 +29,8 @@ public:
 
   void SetUniform(const char *name, const glm::mat4x4 &matrix) const noexcept;
 
+  [[nodiscard]] const uint32_t &GetHandle() const { return handle_; }
+
 private:
   [[nodiscard]] uint32_t
   CreateShader_(const std::string &vertexShader,
@@ -34,12 +39,10 @@ private:
   CompileShader_(uint32_t type, const std::string &source) const noexcept;
 
   [[nodiscard]] int32_t GetUniformLocation_(const char *name) const noexcept;
-  [[nodiscard]] std::string ReadTextFile(const char *path);
 
 private:
   mutable std::unordered_map<std::string, int> uniformLocationCache_{};
   uint32_t handle_{};
-  // caching for uniforms
 };
 
 } // namespace Rem

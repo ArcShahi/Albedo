@@ -10,7 +10,6 @@ namespace Rem {
 class Texture {
 public:
   Texture(const std::string &path);
-  Texture();
 
   ~Texture();
   void bind(uint32_t slot = 0) const noexcept;

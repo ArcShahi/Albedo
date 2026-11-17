@@ -31,6 +31,10 @@ target_sources(rem
              include/Rem/Renderer/Renderer.hpp
              include/Rem/Renderer/FrameBuffer.hpp
              include/Rem/Renderer/Shader.hpp
+             include/Rem/Renderer/VertexBuffer.hpp
+             include/Rem/Renderer/VertexArray.hpp
+             include/Rem/Renderer/IndexBuffer.hpp
+             include/Rem/Renderer/Common.hpp
 )
 
 
