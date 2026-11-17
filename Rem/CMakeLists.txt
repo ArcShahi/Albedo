@@ -10,7 +10,6 @@ add_library(rem)
 target_sources(rem 
         PRIVATE 
         src/Window.cpp
-        src/Layer.cpp
         src/App.cpp
         src/Renderer.cpp
         src/FrameBuffer.cpp

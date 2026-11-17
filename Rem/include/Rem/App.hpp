@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include <set>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -33,29 +34,27 @@ public:
   template <typename TLayer>
     requires(std::is_base_of_v<Layer, TLayer>)
     void PushLayer() {
-    layerStack_.push_back(std::make_unique<TLayer>());
+    layerStack_.emplace_back(std::make_shared<TLayer>())->OnAttach();
   }
-
-  template <typename TLayer>
-    requires(std::is_base_of_v<Layer, TLayer>)
-  [[nodiscard]] TLayer *GetLayer() {
-    for (const auto &layer : layerStack_) {
-      if (auto casted = dynamic_cast<TLayer *>(layer.get()))
-        return casted;
-    }
-    return nullptr;
+  void PushLayer(const std::shared_ptr<Layer> &layer) {
+    layerStack_.emplace_back(layer);
+    layer->OnAttach();
   }
 
   [[nodiscard]] glm::vec2 GetFramebufferSize() const;
 
-  [[nodiscard]] std::shared_ptr<Window> GetWindow() const { return window_; }
+  [[nodiscard]] std::shared_ptr<Window> GetWindowHandle() const { return window_; }
 
   static App &Get();
   [[nodiscard]] static float GetTime();
 
 private:
+  void Init();
+  void Shutdown();
+
+private:
   AppSpecs specs_{};
-  std::vector<std::unique_ptr<Layer>> layerStack_{};
+  std::vector<std::shared_ptr<Layer>> layerStack_{};
   std::shared_ptr<Window> window_{};
   bool running_{false};
 

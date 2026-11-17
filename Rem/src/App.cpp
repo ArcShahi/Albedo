@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <ranges>
 
 namespace Rem {
 
@@ -15,26 +16,11 @@ static App *sApp{nullptr};
 App::App(const AppSpecs &specs) : specs_{specs} {
 
   sApp = this;
-
+  Init();
   // Error Callback
-
-  glfwInit();
-
-  specs_.windowSpecs.eventCallback = [this](Event &event) {
-    RaiseEvent(event);
-  };
-
-  window_ = std::make_shared<Window>(specs_.windowSpecs);
-  window_->Create();
-
-  // error callback;
 }
 
-App::~App() {
-  window_->Destroy();
-  glfwTerminate();
-  sApp = nullptr;
-}
+App::~App() { Shutdown(); }
 
 void App::Run() noexcept {
 
@@ -61,18 +47,19 @@ void App::Run() noexcept {
 
     // Can use another thread to render
     for (const auto &layer : layerStack_) {
-      layer->OnRender();
+      layer->OnUIRender();
     }
     window_->Update();
+
+    // Transition here if needed after the updates are done
   }
 }
 
 void App::Stop() noexcept { running_ = false; }
 
 void App::RaiseEvent(Event &event) {
-
-  for (auto itr{layerStack_.end() - 1}; itr != layerStack_.begin(); --itr) {
-    (*itr)->OnEvent(event);
+  for (auto &layer : std::ranges::views::reverse(layerStack_)) {
+    layer->OnEvent(event);
     if (event.handled)
       break;
   }
@@ -89,4 +76,29 @@ App &App::Get() {
 
 float App::GetTime() { return static_cast<float>(glfwGetTime()); }
 
+void App::Init() {
+
+  glfwInit();
+
+  specs_.windowSpecs.eventCallback = [this](Event &event) {
+    RaiseEvent(event);
+  };
+
+  window_ = std::make_shared<Window>(specs_.windowSpecs);
+  window_->Create();
+
+  // error callback;
+}
+
+void App::Shutdown() {
+
+  for (auto &layer : layerStack_) {
+    layer->OnDetach();
+  }
+  layerStack_.clear();
+
+  window_->Destroy();
+  glfwTerminate();
+  sApp = nullptr;
+}
 } // namespace Rem
