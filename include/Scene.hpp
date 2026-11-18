@@ -2,10 +2,10 @@
 #pragma once
 
 #include <Rem/App.hpp>
-#include <Rem/Renderer/Common.hpp>
+#include <Rem/Renderer/Renderer.hpp>
 #include <Rem/Renderer/Shader.hpp>
+#include <Rem/Renderer/VertexArray.hpp>
 
-#include <optional>
 
 class SceneLayer : public Rem::Layer {
 public:
@@ -15,9 +15,9 @@ public:
   void OnRender() override;
 
 private:
-  Rem::VertexArray vao_{};
-  std::optional<Rem::VertexBuffer> vbo_{}; // Created in OnAttact 
-  Rem::IndexBuffer ibo_{};
   Rem::Shader shader_{};
-  Rem::Texture texture_{ASSETS "/albedo.png"};
+  Rem::FrameBuffer fbo_{};
+  Rem::Texture texture_{};
+  Rem::Texture target_{};
+  Rem::VertexArray vao_{};
 };

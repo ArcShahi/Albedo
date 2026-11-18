@@ -1,9 +1,12 @@
 #include <Rem/Renderer/Shader.hpp>
+
 #include <fstream>
-#include <glad\glad.h>
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Rem {
 
@@ -112,6 +115,7 @@ void Shader::Reload(const char *vs, const char *fs) noexcept {
   if (handle != -1) {
     glDeleteProgram(handle_);
     handle_ = handle;
+    uniformLocationCache_.clear();
   }
 }
 
@@ -130,7 +134,8 @@ void Shader::SetUniform(const char *name, int val) const noexcept {
 void Shader::SetUniform(const char *name,
                         const glm::mat4x4 &matrix) const noexcept {
   // We don't need to transpose it if we've row major order
-  glUniformMatrix4fv(GetUniformLocation_(name), 1, false, &matrix[0][0]);
+ // glUniformMatrix4fv(GetUniformLocation_(name), 1, false, &matrix[0][0]);
+  glUniformMatrix4fv(GetUniformLocation_(name), 1, false, glm::value_ptr(matrix));
 }
 
 } // namespace Rem

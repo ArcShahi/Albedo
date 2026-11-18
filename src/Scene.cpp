@@ -3,62 +3,47 @@
 
 void SceneLayer::OnAttach() {
 
-  // Map Postion and Texture coord : Texture coord (0,0) from bottom left
-  // instead of at center
-/*  std::array<float, 20> vertex_data{
-      // pos                 uv
-      0.5f,  0.5f,  0.0f, 1.0f, 1.0f, // 0 top right
-      -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, // 1 top left
-      0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, // 2 bottom right
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f  // 3 bottom left
-  };*/
-  std::array<float, 16> vertex_data{
-      // pos                 uv
-      1.0f,  1.0f, 1.0f, 1.0f, // 0 top right
-      -1.0f, 1.0f, 0.0f, 1.0f, // 1 top left
-      1.0f,  -1.0, 1.0f, 0.0f, // 2 bottom right
-      -1.0f, -1.0, 0.0f, 0.0f  // 3 bottom left
-  };
+  // Will be smapled by shader
+  texture_ = Rem::LoadTexture(ASSETS "/albedo.png");
+  if (!texture_.handle) {
+    std::cerr << "Couldn't load texture\n";
+  }
 
-  std::array<uint32_t, 6> indices{0, 1, 3, 0, 3, 2};
+  // Render target : need to resize later
+  target_ = Rem::CreateTexture(1280, 720);
+  fbo_ = Rem::CreateFrameBufferWithTexture(target_);
+  if (!fbo_.handle) {
+    std::cerr << "Framebuffer fucked\n";
+  }
 
-  Rem::VertexBuffer tmpVB{
-      vertex_data.data(),
-      static_cast<uint32_t>(vertex_data.size() * sizeof(float))};
+  shader_.Init(SHADERS + std::string("/vertex.shader"),
+               SHADERS + std::string("/fragment.shader"));
 
-  ibo_.Init(indices.data(), static_cast<uint32_t>(indices.size()));
-
-  // Read from the specified buffer
-  vao_.VertexBufferInfo(0, tmpVB.GetHandle(), 4 * sizeof(float), 0);
-  vao_.IndextBufferInfo(ibo_.GetHandle());
-
-  // Link Attrib 0 that has 2 elements of type float and offset 0 in vertex
-  // data to slot 0 of VA
-  vao_.AddAttrib<float, 2>(0, 0);
-
-  // Link attrib 1 that has 2 elements of type float and offset of 12 B
-  vao_.AddAttrib<float, 2>(1, 2 * sizeof(float));
-
-  // Bind the texture
-  texture_.bind(0);
-
-  // Shader
-  std::string vsPath{SHADERS + std::string("/vertex.shader")};
-  std::string fsPath{SHADERS + std::string("/fragment.shader")};
-
-  shader_.Init(vsPath, fsPath);
   shader_.Use();
-  shader_.SetUniform("uTexture", 0); // out texture is bound to slot 0
+  shader_.SetUniform("uTexture", 0); // sampler will fetch fromn this
 }
 
-void SceneLayer::OnDetach() { std::cout << "Scene yanked\n"; }
+void SceneLayer::OnDetach() {
+  Rem::DestroyFrameBuffer(fbo_);
+  Rem::DestroyTexture(target_);
+  Rem::DestroyTexture(texture_);
+}
 
-void SceneLayer::OnUpdate([[maybe_unused]]float dt) {
+void SceneLayer::OnUpdate([[maybe_unused]] float dt) {
 
   // For CPU sdie logic will fuck rendering
 }
 
 void SceneLayer::OnRender() {
+
+  // TODO IMGUI stuff
+
+  int window[4]{};
+  glGetIntegerv(GL_VIEWPORT, window);
+
+  // Draw to texture
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_.handle);
+  glViewport(0, 0, target_.width, target_.height);
 
   // Clear Screen
   glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
@@ -69,6 +54,11 @@ void SceneLayer::OnRender() {
   shader_.SetUniform("uTime", Rem::App::GetTime());
 
   // Draw
+  glBindTextureUnit(0, texture_.handle);
   vao_.Bind();
-  glDrawElements(GL_TRIANGLES, ibo_.ElementCount(), GL_UNSIGNED_INT, nullptr);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+
+  // Back to the window
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glViewport(window[0], window[1], window[2], window[3]);
 }

@@ -9,10 +9,9 @@ add_library(rem)
 
 target_sources(rem 
         PRIVATE 
-        src/Window.cpp
         src/App.cpp
+        src/Window.cpp
         src/Renderer.cpp
-        src/FrameBuffer.cpp
         src/Shader.cpp
      
         # Headers TODO biatch
@@ -26,13 +25,9 @@ target_sources(rem
              include/Rem/WindowEvents.hpp
              include/Rem/Layer.hpp
              include/Rem/App.hpp
-             include/Rem/Renderer/Renderer.hpp
-             include/Rem/Renderer/FrameBuffer.hpp
              include/Rem/Renderer/Shader.hpp
-             include/Rem/Renderer/VertexBuffer.hpp
              include/Rem/Renderer/VertexArray.hpp
-             include/Rem/Renderer/IndexBuffer.hpp
-             include/Rem/Renderer/Common.hpp
+             include/Rem/Renderer/Renderer.hpp
              include/Rem/Utils.hpp
 )
 
