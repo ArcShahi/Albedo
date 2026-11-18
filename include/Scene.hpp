@@ -13,11 +13,13 @@ public:
   void OnDetach() override;
   void OnUpdate(float dt) override;
   void OnRender() override;
+  void OnUIRender() override;
 
 private:
   Rem::Shader shader_{};
   Rem::FrameBuffer fbo_{};
   Rem::Texture texture_{};
   Rem::Texture target_{};
+  glm::vec2 viewportSize_{};
   Rem::VertexArray vao_{};
 };

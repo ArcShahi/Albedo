@@ -35,6 +35,7 @@ target_sources(rem
 include(dependencies.cmake)
 add_subdirectory(vendors/glad)
 add_subdirectory(vendors/stb)
+add_subdirectory(vendors/imgui)
 
 target_compile_features(rem PRIVATE cxx_std_23)
 
@@ -45,7 +46,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 # Remove console if wanted 
 
 # Link libraries
-target_link_libraries(rem PUBLIC glm::glm glfw glad stb)
+target_link_libraries(rem PUBLIC glm::glm glfw glad stb imgui)
 # liknk dwampi( what a name) for windows...
 target_link_libraries(rem PUBLIC $<$<PLATFORM_ID:Windows>:dwmapi>)
 
