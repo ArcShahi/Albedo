@@ -30,6 +30,7 @@ target_sources(albedo
 include(dependencies.cmake)
 add_subdirectory(vendors/glad)
 add_subdirectory(vendors/stb)
+add_subdirectory(vendors/imgui)
 
 target_compile_features(albedo PRIVATE cxx_std_23)
 
@@ -45,7 +46,7 @@ target_compile_definitions(albedo PRIVATE ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/as
 target_compile_definitions(albedo PRIVATE SHADERS="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 
 # Link libraries
-target_link_libraries(albedo PUBLIC glm::glm glfw glad stb)
+target_link_libraries(albedo PUBLIC glm::glm glfw glad stb imgui)
 # liknk dwampi( what a name) for windows...
 target_link_libraries(albedo PUBLIC $<$<PLATFORM_ID:Windows>:dwmapi>)
 

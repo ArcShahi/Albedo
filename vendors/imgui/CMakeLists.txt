@@ -12,6 +12,8 @@ target_sources(imgui
         imgui_widgets.cpp
         imgui_impl_glfw.cpp
         imgui_impl_opengl3.cpp
+        imgui_stdlib.cpp
+
     PUBLIC
         FILE_SET HEADERS
         BASE_DIRS .
@@ -25,6 +27,7 @@ target_sources(imgui
             imstb_rectpack.h
             imstb_textedit.h
             imstb_truetype.h
+            imgui_stdlib.h
 )
 
 
