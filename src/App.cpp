@@ -193,7 +193,6 @@ void Albedo::Render() noexcept {
 
 void Albedo::UIRender() noexcept {
 
-  // Back to the window
   int fbw{}, fbh{};
   glfwGetFramebufferSize(window_, &fbw, &fbh);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -216,21 +215,46 @@ void Albedo::UIRender() noexcept {
     }
   }
 
-  const float logHeight{ImGui::GetTextLineHeightWithSpacing() * 6};
   ImVec2 editorAvail{ImGui::GetContentRegionAvail()};
 
-  // Buffer for Editor
+  // Buffer for Editor : TODO Synatax Highlight
   ImGui::InputTextMultiline("##Fragment", &fragSource_,
-                            ImVec2(editorAvail.x, editorAvail.y - logHeight),
+                            ImVec2(editorAvail.x, editorAvail.y),
                             ImGuiInputTextFlags_AllowTabInput);
-
-  ImGui::BeginChild("##Console");
-  ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s",
-                     shader_.Log().c_str());
-  ImGui::EndChild();
-
   ImGui::End();
 #pragma endregion
+
+
+#pragma region CONSOLE
+
+  ImGui::Begin("Console");
+  const ImGuiIO &io{ImGui::GetIO()};
+  const double time{glfwGetTime()};
+
+  ImGui::Text("Frame       %.0f FPS", io.Framerate);
+  ImGui::Text("Resolution  %d x %d", targetTexture_.width,
+              targetTexture_.height);
+
+  if (ImGui::CollapsingHeader("Inputs", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::BulletText("float      uTime        %.2f", time);
+    ImGui::BulletText("vec2       uResolution  %d, %d", targetTexture_.width,
+                      targetTexture_.height);
+    ImGui::BulletText("sampler2D  uTexture     unit 0 (albedo.png)");
+  }
+
+  ImGui::SeparatorText("Log");
+  if (shader_.Log().empty()) {
+    ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Shader is fine boiii");
+  } else {
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
+    ImGui::TextWrapped("%s", shader_.Log().c_str());
+    ImGui::PopStyleColor();
+  }
+
+  ImGui::End();
+
+#pragma endregion 
+
 
 #pragma region SCENE
 

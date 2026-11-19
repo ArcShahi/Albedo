@@ -87,6 +87,7 @@ void Shader::Destroy() noexcept {
   uniformLocationCache_.clear();
 }
 
+// TODO : Parser for source to fetch uniforms
 bool Shader::CreateShader(const std::string &fragsrc) noexcept {
 
   std::string log{};
