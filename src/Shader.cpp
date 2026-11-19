@@ -51,9 +51,7 @@ constexpr const char *VERTEX_SHADER_SRC{R"(
   int hoe{};
   glGetShaderiv(handle, GL_COMPILE_STATUS, &hoe);
   if (!hoe) {
-    // log = InfoLog(handle, false);
-    log = (type == GL_VERTEX_SHADER ? "[vertex] " : "[fragment] ") +
-          InfoLog(handle, false);
+    log = InfoLog(handle, false);
     glDeleteShader(handle);
     return 0;
   }
@@ -95,6 +93,7 @@ bool Shader::CreateShader(const std::string &fragsrc) noexcept {
   const uint32_t fs{CompileShader(GL_FRAGMENT_SHADER, fragsrc.c_str(), log)};
 
   if (!fs || !vs) {
+    log_ = std::move(log);
     glDeleteShader(fs);
     glDeleteShader(vs);
     return false;
@@ -122,6 +121,7 @@ bool Shader::CreateShader(const std::string &fragsrc) noexcept {
   glDeleteProgram(handle_);
   handle_ = program;
   uniformLocationCache_.clear();
+  log_.clear();
   return true;
 }
 

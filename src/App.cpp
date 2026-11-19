@@ -246,9 +246,8 @@ void Albedo::UIRender() noexcept {
   if (shader_.Log().empty()) {
     ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Shader is fine boiii");
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
-    ImGui::TextWrapped("%s", shader_.Log().c_str());
-    ImGui::PopStyleColor();
+    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s",
+                       shader_.Log().c_str());
   }
 
   ImGui::End();
