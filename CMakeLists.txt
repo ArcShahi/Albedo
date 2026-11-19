@@ -11,6 +11,8 @@ target_sources(albedo
         PRIVATE 
         src/App.cpp
         src/Main.cpp
+        src/Shader.cpp
+        src/Renderer.cpp
      
      
         # Can't have this...
@@ -20,7 +22,9 @@ target_sources(albedo
              FILES
              include/App.hpp
              include/PlatformWin32.hpp
-)
+             include/Renderer/Shader.hpp
+             include/Renderer/Renderer.hpp
+ )
 
 
 include(dependencies.cmake)
@@ -34,6 +38,11 @@ target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
 # Match VS filters to directory structure on disk
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 # Remove console if wanted 
+
+
+# Path to assets and shader as compiler definition
+target_compile_definitions(albedo PRIVATE ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+target_compile_definitions(albedo PRIVATE SHADERS="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 
 # Link libraries
 target_link_libraries(albedo PUBLIC glm::glm glfw glad stb)

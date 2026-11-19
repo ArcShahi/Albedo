@@ -1,5 +1,7 @@
 #include "App.hpp"
 
+using namespace std::string_literals;
+
 namespace {
 
 namespace Color {
@@ -15,7 +17,7 @@ namespace Rem {
 bool Albedo::Init() noexcept {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////					       GLFW INIT ////
+  ////					       GLFW INIT
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   if (!glfwInit()) {
@@ -39,7 +41,7 @@ bool Albedo::Init() noexcept {
   glfwMakeContextCurrent(window_);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
-  ////                         OpenGL ///
+  ////                                OpenGL
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -48,27 +50,57 @@ bool Albedo::Init() noexcept {
   }
 
   //  Resizable viewport oh yeah
-  glfwSetFramebufferSizeCallback(window_,
-                                 [](GLFWwindow *window, int width, int height) {
-                                   glViewport(0, 0, width, height);
-                                 });
+  glfwSetFramebufferSizeCallback(
+      window_, [](GLFWwindow *, int w, int h) { glViewport(0, 0, w, h); });
+
+  // Init OpenGL Object
+
+  // Vertex Array
+  glCreateVertexArrays(1, &vao_);
+
+  // will be sampled by shader first pass
+  srcTexture_ = Rem::LoadTexture(ASSETS+"/albedo.png"s);
+  if (!srcTexture_.handle) {
+    std::cerr << "Can't load texture";
+  }
+
+  // Frame buffer and texture target
+  int fbw{}, fbh{};
+  glfwGetFramebufferSize(window_, &fbw, &fbh);
+  targetTexture_ = Rem::CreateTexture(fbw, fbh);
+
+  fbo_ = Rem::CreateFrameBufferWithTexture(targetTexture_);
+  if (!fbo_.handle) {
+    std::cerr << "Framebuffer fucked\n";
+    return false;
+  }
+
+  // Shader Stuff
+  shader_.Init(SHADERS + "/vertex.shader"s, SHADERS + "/frag.shader"s);
+  shader_.Use();
+  shader_.SetUniform("uTexture", 0); // will be sampled foromslot 0
 
   // IMGUI : INIT TODO
 
   return true;
 }
+
 void Albedo::ShutDown() noexcept {
+  Rem::DestroyFrameBuffer(fbo_);
+  Rem::DestroyTexture(targetTexture_);
+  Rem::DestroyTexture(srcTexture_);
+  glDeleteVertexArrays(1, &vao_);
 
   glfwDestroyWindow(window_);
+  window_ = nullptr;
   glfwTerminate();
 }
 void Albedo::Run() noexcept {
 
-  running_ = true;
-
+  // LOOP LOOP BABY , LOOP LOOP BABY
   float lastTime{static_cast<float>(glfwGetTime())};
 
-  while (running_ && !glfwWindowShouldClose(window_)) {
+  while (!glfwWindowShouldClose(window_)) {
     glfwPollEvents();
 
     float currentTime{static_cast<float>(glfwGetTime())};
@@ -76,22 +108,58 @@ void Albedo::Run() noexcept {
     lastTime = currentTime;
 
     Update(dt);
-    Render(); // what the fuck will do in this
+    Render();
+    UIRender();
 
-    // OpenGL Binding and stuff
-
-    // RENDER
-    glClearColor(0.1f, 0.1f, 0.1f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // Swap buffers and Poll IO events
     glfwSwapBuffers(window_);
-
-    // IMGUI::TODO
   }
 }
 void Albedo::Update(float dt) noexcept {}
-void Albedo::Render() noexcept {}
-void Albedo::UIRender() noexcept {}
+
+void Albedo::Render() noexcept {
+
+  // Keep the target matching the window : TODO IMGUI PANEL
+  int fbw{}, fbh{};
+  glfwGetFramebufferSize(window_, &fbw, &fbh);
+  if (fbw > 0 && fbh > 0 &&
+      (fbw != targetTexture_.width || fbh != targetTexture_.height)) {
+    ResizeTarget(fbw, fbh);
+  }
+
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_.handle);
+  glViewport(0, 0, targetTexture_.width, targetTexture_.height);
+
+  shader_.Use();
+  shader_.SetUniform("uTime", static_cast<float>(glfwGetTime()));
+  shader_.SetUniform("uResolution",
+                     glm::vec2(targetTexture_.width, targetTexture_.height));
+
+  glBindTextureUnit(0, srcTexture_.handle);
+  glBindVertexArray(vao_);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Albedo::UIRender() noexcept {
+  // TODO::IMGUI
+  int fbw{}, fbh{};
+  glfwGetFramebufferSize(window_, &fbw, &fbh);
+
+  glBlitNamedFramebuffer(fbo_.handle, 0, 0, 0, targetTexture_.width,
+                         targetTexture_.height, 0, 0, fbw, fbh,
+                         GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+void Albedo::ResizeTarget(int width, int height) noexcept {
+
+  if (width <= 0 || height <= 0)
+    return;
+
+  Rem::DestroyFrameBuffer(fbo_);
+  Rem::DestroyTexture(targetTexture_);
+
+  targetTexture_ = Rem::CreateTexture(width, height);
+  fbo_ = CreateFrameBufferWithTexture(targetTexture_);
+}
+
 Albedo::~Albedo() { ShutDown(); }
 } // namespace Rem
