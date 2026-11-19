@@ -10,54 +10,57 @@
 
 namespace Rem {
 
-static std::string ReadTextFile(const std::string &path) {
+namespace {
+// Don't even touch it
+constexpr const char *VERTEX_SHADER_SRC{R"(
+ #version 460 core
+ out vec2 vUv;
+ void main() {
+  vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
+  vUv = p;
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+})"};
 
-  std::cout << path << '\n';
-  std::ifstream file{path};
+[[nodiscard]] std::string InfoLog(const uint32_t &handle, bool isProgram) {
 
-  if (!file) {
-    std::cerr << "File not read!!\n";
-    return "";
+  int len{};
+  if (isProgram)
+    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &len);
+  else
+    glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &len);
+
+  if (len <= 1)
+    return {};
+
+  std::string info(len, '\0');
+  if (isProgram)
+    glGetProgramInfoLog(handle, len, nullptr, info.data());
+  else
+    glGetShaderInfoLog(handle, len, nullptr, info.data());
+
+  return info;
+}
+
+[[nodiscard]] uint32_t CompileShader(uint32_t type, const char *src,
+                                     std::string &log) {
+
+  const uint32_t handle{glCreateShader(type)};
+  glShaderSource(handle, 1, &src, nullptr);
+  glCompileShader(handle);
+
+  int hoe{};
+  glGetShaderiv(handle, GL_COMPILE_STATUS, &hoe);
+  if (!hoe) {
+    // log = InfoLog(handle, false);
+    log = (type == GL_VERTEX_SHADER ? "[vertex] " : "[fragment] ") +
+          InfoLog(handle, false);
+    glDeleteShader(handle);
+    return 0;
   }
-
-  std::stringstream ss{};
-  ss << file.rdbuf();
-  return ss.str();
+  return handle;
 }
 
-void Shader::Init(const std::string &vertexPath,
-                  const std::string &fragPath) noexcept {
-
- std::cout << "Vertex Path : " << vertexPath << "frag path : " << fragPath
-            << '\n';
-  const std::string vs{ReadTextFile(vertexPath)};
-  const std::string fs{ReadTextFile(fragPath)};
-  handle_ = CreateShader_(vs, fs);
-}
-
-uint32_t Shader::CompileShader_(uint32_t type,
-                                const std::string &source) const noexcept {
-  uint32_t id{glCreateShader(type)};
-  const char *src{source.c_str()};
-  glShaderSource(id, 1, &src, nullptr);
-  glCompileShader(id);
-
-  int success{};
-  glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    int errlen{0};
-    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errlen);
-    std::string infoLog(errlen, '\0');
-    glGetShaderInfoLog(id, errlen, nullptr, infoLog.data());
-    std::cerr << "\nERROR: "
-              << (type == GL_VERTEX_SHADER ? "Vertex" : "Fragment")
-              << " shader compilation failed\n"
-              << infoLog << '\n';
-    glDeleteShader(id);
-    return 0; // 0 is never a valid shader ID
-  }
-  return id;
-}
+} // namespace
 
 int32_t Shader::GetUniformLocation_(const char *name) const noexcept {
   int32_t uniformLocation{};
@@ -74,76 +77,75 @@ int32_t Shader::GetUniformLocation_(const char *name) const noexcept {
   return uniformLocation;
 }
 
-uint32_t
-Shader::CreateShader_(const std::string &vertexShader,
-                      const std::string &fragmentShader) const noexcept {
-
-  auto vs{CompileShader_(GL_VERTEX_SHADER, vertexShader)};
-  auto fs{CompileShader_(GL_FRAGMENT_SHADER, fragmentShader)};
-  if (vs == 0 || fs == 0) {
-    if (vs)
-      glDeleteShader(vs);
-    if (fs)
-      glDeleteShader(fs);
-    return 0;
-  }
-
-  auto handle{glCreateProgram()};
-  glAttachShader(handle, vs);
-  glAttachShader(handle, fs);
-  glLinkProgram(handle);
-
-  int success{};
-  glGetProgramiv(handle, GL_LINK_STATUS, &success);
-  glDeleteShader(vs);
-  glDeleteShader(fs);
-
-  if (!success) {
-    int errlen{0};
-    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &errlen);
-    std::string infoLog(errlen, '\0');
-    glGetProgramInfoLog(handle, errlen, nullptr, infoLog.data());
-    std::cerr << "\nERROR: Linking shader program failed\n" << infoLog << '\n';
-    glDeleteProgram(handle);
-    return 0;
-  }
-  return handle;
-}
-
 void Shader::Use() const noexcept { glUseProgram(handle_); }
 
-void Shader::Reload(const char *vs, const char *fs) noexcept {
-  auto handle{CreateShader_(ReadTextFile(vs), ReadTextFile(fs))};
-  // if failed keep the olderone
-  if (handle != -1) {
-    glDeleteProgram(handle_);
-    handle_ = handle;
-    uniformLocationCache_.clear();
+void Shader::Destroy() noexcept {
+  glDeleteProgram(handle_);
+  handle_ = 0;
+
+  // Don't really need to clear it ; the hasmap will fking call it
+  uniformLocationCache_.clear();
+}
+
+bool Shader::CreateShader(const std::string &fragsrc) noexcept {
+
+  std::string log{};
+  const uint32_t vs{CompileShader(GL_VERTEX_SHADER, VERTEX_SHADER_SRC, log)};
+  const uint32_t fs{CompileShader(GL_FRAGMENT_SHADER, fragsrc.c_str(), log)};
+
+  if (!fs || !vs) {
+    glDeleteShader(fs);
+    glDeleteShader(vs);
+    return false;
   }
+
+  const uint32_t program{glCreateProgram()};
+  glAttachShader(program, fs);
+  glAttachShader(program, vs);
+  glLinkProgram(program);
+  glDetachShader(program, fs);
+  glDetachShader(program, vs);
+  glDeleteShader(fs);
+  glDeleteShader(vs);
+
+  int hoe{};
+  glGetProgramiv(program, GL_LINK_STATUS, &hoe);
+  if (!hoe) {
+    log_ = InfoLog(program, true);
+
+    glDeleteProgram(program);
+    return false;
+  }
+
+  // Swap with update shader
+  glDeleteProgram(handle_);
+  handle_ = program;
+  uniformLocationCache_.clear();
+  return true;
 }
 
-void Shader::SetUniform(const char *name, glm::vec4 val) const noexcept {
-  glUniform4f(GetUniformLocation_(name), val.x, val.y, val.z, val.w);
+void Shader::SetUniform(const std::string &name, glm::vec4 val) const noexcept {
+  glUniform4f(GetUniformLocation_(name.c_str()), val.x, val.y, val.z, val.w);
 }
 
-void Shader::SetUniform(const char *name, float val) const noexcept {
-  glUniform1f(GetUniformLocation_(name), val);
+void Shader::SetUniform(const std::string &name, float val) const noexcept {
+  glUniform1f(GetUniformLocation_(name.c_str()), val);
 }
 
-void Shader::SetUniform(const char *name, int val) const noexcept {
-  glUniform1i(GetUniformLocation_(name), val);
+void Shader::SetUniform(const std::string &name, int val) const noexcept {
+  glUniform1i(GetUniformLocation_(name.c_str()), val);
 }
 
-void Shader::SetUniform(const char *name,
+void Shader::SetUniform(const std::string &name,
                         const glm::mat4x4 &matrix) const noexcept {
   // We don't need to transpose it if we've row major order
-  glUniformMatrix4fv(GetUniformLocation_(name), 1, false,
+  glUniformMatrix4fv(GetUniformLocation_(name.c_str()), 1, false,
                      glm::value_ptr(matrix));
 }
 
-void Shader::SetUniform(const char *name, const glm::vec2 &v2) const noexcept {
-  glUniformMatrix4fv(GetUniformLocation_(name), 1, false,
-                     glm::value_ptr(v2));
+void Shader::SetUniform(const std::string &name, float x,
+                        float y) const noexcept {
+  glUniform2f(GetUniformLocation_(name.c_str()), x, y);
 }
 
 } // namespace Rem

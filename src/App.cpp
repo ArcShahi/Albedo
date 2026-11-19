@@ -22,6 +22,8 @@ bool Albedo::Init() noexcept {
   ////					       GLFW INIT
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma region GLFW
+
   if (!glfwInit()) {
     std::cerr << Color::RED << "Failed to intialize GLFW !!\n" << Color::CLEAR;
     return false;
@@ -31,7 +33,7 @@ bool Albedo::Init() noexcept {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  window_ = glfwCreateWindow(1280, 720, "Albedo", nullptr, nullptr);
+  window_ = glfwCreateWindow(1920, 1080, "Albedo", nullptr, nullptr);
 
   if (!window_) {
     std::cerr << Color::RED << "Failed to initialized GLFW window !!\n"
@@ -42,6 +44,8 @@ bool Albedo::Init() noexcept {
   Rem::SetDarkTitleBar(window_, true);
   glfwMakeContextCurrent(window_);
   glfwSwapInterval(1); // vsync
+
+#pragma endregion
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   ////                                OpenGL
@@ -78,27 +82,35 @@ bool Albedo::Init() noexcept {
     return false;
   }
 
-  // Shader Stuff
-  shader_.Init(SHADERS + "/vertex.shader"s, SHADERS + "/frag.shader"s);
-  shader_.Use();
-  shader_.SetUniform("uTexture", 0); // will be sampled foromslot 0
+#pragma region SHADER
 
   std::ifstream file(SHADERS + "/frag.shader"s);
   fragSource_.assign(std::istreambuf_iterator<char>(file), {});
+
+  if (shader_.CreateShader(fragSource_)) {
+    shader_.SetUniform("uTexture", 0); // will be sampled from slot 0
+  } else {
+    std::cerr << shader_.Log();
+  }
+
+#pragma endregion
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   ////                                ImGUI
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma region IMGUI
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io{ImGui::GetIO()};
   ImFont *font{io.Fonts->AddFontFromFileTTF(
-      ASSETS"/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
+      ASSETS "/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
   ImGui_ImplGlfw_InitForOpenGL(window_, true);
   ImGui_ImplOpenGL3_Init("#version 460");
+
+#pragma endregion
 
   return true;
 }
@@ -166,15 +178,17 @@ void Albedo::Render() noexcept {
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_.handle);
   glViewport(0, 0, targetTexture_.width, targetTexture_.height);
 
-  shader_.Use();
-  shader_.SetUniform("uTime", static_cast<float>(glfwGetTime()));
-  shader_.SetUniform("uResolution",
-                     glm::vec2(targetTexture_.width, targetTexture_.height));
+  if (shader_.IsValid()) {
+    shader_.Use();
+    shader_.SetUniform("uTime", static_cast<float>(glfwGetTime()));
+    shader_.SetUniform("uResolution", targetTexture_.width,
+                       targetTexture_.height);
 
-  glBindTextureUnit(0, srcTexture_.handle);
-  glBindVertexArray(vao_);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTextureUnit(0, srcTexture_.handle);
+    glBindVertexArray(vao_);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
 }
 
 void Albedo::UIRender() noexcept {
@@ -193,27 +207,50 @@ void Albedo::UIRender() noexcept {
 
   ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-  // Editor (nothing plugged in yet, edits don't recompile)
-  ImGui::Begin("Editor");
+#pragma region EDITOR
 
-  ImGui::InputTextMultiline("Fragment", &fragSource_,
-                            ImGui::GetContentRegionAvail(),
+  ImGui::Begin("Source");
+  if (ImGui::Button("Compile") || ImGui::IsKeyPressed(ImGuiKey_F5)) {
+    if (shader_.CreateShader(fragSource_)) {
+      shader_.SetUniform("uTexture", 0);
+    }
+  }
+
+  const float logHeight{ImGui::GetTextLineHeightWithSpacing() * 6};
+  ImVec2 editorAvail{ImGui::GetContentRegionAvail()};
+
+  // Buffer for Editor
+  ImGui::InputTextMultiline("##Fragment", &fragSource_,
+                            ImVec2(editorAvail.x, editorAvail.y - logHeight),
                             ImGuiInputTextFlags_AllowTabInput);
+
+  ImGui::BeginChild("##Console");
+  ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s",
+                     shader_.Log().c_str());
+  ImGui::EndChild();
+
   ImGui::End();
+#pragma endregion
+
+#pragma region SCENE
 
   // Scene: the render target, V flipped because GL textures are bottom-up
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::Begin("Scene");
-  const ImVec2 avail = ImGui::GetContentRegionAvail();
-  viewportSize_ = {static_cast<int>(avail.x), static_cast<int>(avail.y)};
-  ImGui::Image((ImTextureID)(intptr_t)targetTexture_.handle, avail,
+  const ImVec2 sceneAvail = ImGui::GetContentRegionAvail();
+  viewportSize_ = {static_cast<int>(sceneAvail.x),
+                   static_cast<int>(sceneAvail.y)};
+  ImGui::Image((ImTextureID)(intptr_t)targetTexture_.handle, sceneAvail,
                ImVec2(0, 1), ImVec2(1, 0));
   ImGui::End();
-  ImGui::PopStyleVar();
 
+#pragma endregion
+
+  ImGui::PopStyleVar();
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
 void Albedo::ResizeTarget(int width, int height) noexcept {
 
   if (width <= 0 || height <= 0)

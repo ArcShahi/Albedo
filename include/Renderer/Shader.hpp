@@ -11,35 +11,32 @@ class Shader {
 
 public:
   Shader() {};
-
-  void Init(const std::string &vertexPath,
-            const std::string &shaderPath) noexcept;
+  ~Shader() { Destroy(); }
   void Use() const noexcept;
 
-  void Reload(const char *vs, const char *fs) noexcept;
+  bool IsValid() const noexcept { return handle_ != 0; }
+  void Destroy() noexcept;
+
+  [[nodiscard]] bool CreateShader(const std::string &fragsrc) noexcept;
+
   // Sets the value of uniform vec4
-  void SetUniform(const char *name, glm::vec4 val) const noexcept;
+  void SetUniform(const std::string& name, glm::vec4 val) const noexcept;
   // Sets the value of uniform float
-  void SetUniform(const char *name, float val) const noexcept;
+  void SetUniform(const std::string& name, float val) const noexcept;
 
-  void SetUniform(const char *name, int val) const noexcept;
+  void SetUniform(const std::string& name, int val) const noexcept;
 
-  void SetUniform(const char *name, const glm::mat4x4 &matrix) const noexcept;
-  void SetUniform(const char *name, const glm::vec2 &v2) const noexcept;
+  void SetUniform(const std::string& name, const glm::mat4x4 &matrix) const noexcept;
+  void SetUniform(const std::string& name, float x,float y) const noexcept;
 
-  [[nodiscard]] const uint32_t &GetHandle() const { return handle_; }
+  [[nodiscard]] const std::string &Log() const { return log_; }
 
 private:
-  [[nodiscard]] uint32_t
-  CreateShader_(const std::string &vertexShader,
-                const std::string &fragmentShader) const noexcept;
-  [[nodiscard]] uint32_t
-  CompileShader_(uint32_t type, const std::string &source) const noexcept;
-
   [[nodiscard]] int32_t GetUniformLocation_(const char *name) const noexcept;
 
 private:
   mutable std::unordered_map<std::string, int> uniformLocationCache_{};
+  std::string log_{};
   uint32_t handle_{};
   // TODO: ERRORLOG for Imgui Console panel
 };
