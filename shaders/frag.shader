@@ -4,12 +4,13 @@ in  vec2 vUv;
 
 uniform sampler2D uTexture;
 uniform float uTime;
+uniform vec2 uResolution;
 
 void main(){
-
-     float fade= sin(uTime)/2.0+0.5f;
-     vec4 TextColor=texture(uTexture,vUv);
-	TextColor*=fade;
-	//textColor=textColor*vec4(0.0,0.0,1.0,1.0);
-     FragColor = TextColor;
+     vec4 TexColor=texture(uTexture,vUv);
+     float Fade= sin(uTime) * 0.5 + 0.5;
+	
+     vec4 Tinted= TexColor * vec4(1.0,0.0,0.0,1.0);
+     FragColor=mix(TexColor,Tinted,Fade);
+    
 }
