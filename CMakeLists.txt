@@ -27,8 +27,11 @@ target_sources(albedo
              include/Renderer/Shader.hpp
              include/Renderer/Renderer.hpp
              include/ErrorLog.hpp
- )
+)
 
+if(WIN32)
+    target_sources(albedo PRIVATE ./icon.rc)
+endif()
 
 include(dependencies.cmake)
 add_subdirectory(vendors/glad)
@@ -38,12 +41,31 @@ add_subdirectory(vendors/goossens)
 
 target_compile_features(albedo PRIVATE cxx_std_23)
 
-# Enable Multiprocessor compilation for MSVC 
-target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
 # Match VS filters to directory structure on disk
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
-# Remove console if wanted 
 
+# Remove console window
+target_link_options(albedo PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>
+)
+
+# MSVC FLags
+target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP;/W4;/Ox;/WX;/permissive>)
+
+# CLANG FLAGS
+set(CLANG_FLAGS
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wshadow
+    -Wold-style-cast
+    -Wunused
+    -Wconversion
+    -Wsign-conversion
+    -Wdouble-promotion
+    -Werror)
+
+target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:Clang>:${CLANG_FLAGS}>)
 
 # Path to assets and shader as compiler definition
 target_compile_definitions(albedo PRIVATE ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets")

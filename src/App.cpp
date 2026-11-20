@@ -2,12 +2,11 @@
 
 #include <fstream>
 
+#include <stb_image.h>
 #include <ErrorLog.hpp>
 #include <languages/TextEditorGLSL.h>
 
 using namespace std::string_literals;
-
-
 
 bool Albedo::Init() noexcept {
 
@@ -34,6 +33,16 @@ bool Albedo::Init() noexcept {
   }
 
   Rem::SetDarkTitleBar(window_, true);
+
+  GLFWimage icon{};
+
+  int channels{};
+  icon.pixels = stbi_load("assets/albedo.png", &icon.width, &icon.height, &channels, 4);
+
+  glfwSetWindowIcon(window_, 1, &icon);
+
+  stbi_image_free(icon.pixels);
+
   glfwMakeContextCurrent(window_);
   glfwSwapInterval(1); // vsync
 
@@ -86,7 +95,7 @@ bool Albedo::Init() noexcept {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io{ImGui::GetIO()};
-  ImFont *font{io.Fonts->AddFontFromFileTTF(
+  [[maybe_unused]] ImFont *font{io.Fonts->AddFontFromFileTTF(
       ASSETS "/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
@@ -160,7 +169,7 @@ void Albedo::Run() noexcept {
   }
 }
 
-void Albedo::Update(float dt) noexcept {
+void Albedo::Update([[maybe_unused]] float dt) noexcept {
   if (ImGui::IsKeyPressed(ImGuiKey_F11, false))
     ToggleFullscreen_();
 }
@@ -179,8 +188,8 @@ void Albedo::Render() noexcept {
   // Keep the target matching the IMGUI PANEL
 
   if (viewportSize_.x > 0 && viewportSize_.y > 0 &&
-      (viewportSize_.x != targetTexture_.width ||
-       viewportSize_.y != targetTexture_.height)) {
+      (viewportSize_.x != static_cast<int>(targetTexture_.width) ||
+       viewportSize_.y != static_cast<int>(targetTexture_.height))) {
     ResizeTarget(viewportSize_.x, viewportSize_.y);
   }
 
@@ -190,8 +199,8 @@ void Albedo::Render() noexcept {
   if (shader_.IsValid()) {
     shader_.Use();
     shader_.SetUniform("uTime", static_cast<float>(glfwGetTime()));
-    shader_.SetUniform("uResolution", targetTexture_.width,
-                       targetTexture_.height);
+    shader_.SetUniform("uResolution", static_cast<float>(targetTexture_.width),
+                       static_cast<float>(targetTexture_.height));
     shader_.SetUniform("uMouse", mouse_.x, mouse_.y);
 
     glBindTextureUnit(0, srcTexture_.handle);
@@ -222,11 +231,9 @@ void Albedo::UIRender() noexcept {
 
   ImGui::Begin("Editor");
 
-  // TODO: Don't compile if no changes in file
-
   if (const auto undo{editor_.GetUndoIndex()};
       undo != editorInfo_.LastUndoIndex) {
-    editorInfo_.LastUndoIndex = undo;
+    editorInfo_.LastUndoIndex = static_cast<uint32_t>(undo);
     editorInfo_.Dirty = true;
   }
 
@@ -345,18 +352,18 @@ void Albedo::ToggleFullscreen_() noexcept {
 void Albedo::CompileFromEditor_() noexcept {
 
   if (!editorInfo_.Dirty) {
-    editorInfo_.SkippedTime = glfwGetTime();
-    return ;
+    editorInfo_.SkippedTime = static_cast<float>(glfwGetTime());
+    return;
   }
   editorInfo_.Dirty = false;
 
   const auto start{glfwGetTime()};
   const bool ok{shader_.CreateShader(editor_.GetText())};
-  editorInfo_.CompileTime = static_cast<float>((glfwGetTime() - start) * 1000.0f);
+  editorInfo_.CompileTime =
+      static_cast<float>((glfwGetTime() - start) * 1000.0f);
 
   if (ok) {
     shader_.SetUniform("uTexture",
                        0); // new shader program so have to add again
   }
 }
-
