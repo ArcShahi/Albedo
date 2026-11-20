@@ -24,7 +24,6 @@ namespace Rem {
 
 [[nodiscard]] Texture LoadTexture(const std::string &path) noexcept {
 
-  std::cout << "Texture path: " << path << '\n';
   int width{}, height{};
 
   // In OpeGL texture's (0,0) is at bottom left instead of top left

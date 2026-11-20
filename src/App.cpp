@@ -217,20 +217,18 @@ void Albedo::UIRender() noexcept {
 
   ImGui::Begin("Editor");
 
-  if (ImGui::Button("Compile") || ImGui::IsKeyPressed(ImGuiKey_F5, false)) {
+  if (/*ImGui::Button("Compile") || */ImGui::IsKeyPressed(ImGuiKey_F5, false)) {
     CompileFromEditor_();
   }
 
-  ImGui::SameLine();
-  ImGui::TextDisabled("F5");    // shortcut hint
   editor_.Render("##Fragment"); // fills the rest of the panel
 
   ImGui::End();
 #pragma endregion
 
-#pragma region INPUTS_PANEL
+#pragma region SHADER_INPUTS_PANEL
 
-  ImGui::Begin("Inputs");
+  ImGui::Begin("Shader inputs");
   const ImGuiIO &io{ImGui::GetIO()};
 
   ImGui::Text("%.0f FPS", io.Framerate);
