@@ -1,7 +1,7 @@
 <h1 align="center">Albedo</h1>
 
 ![Version](https://img.shields.io/badge/Version-1.0-blue?style=for-the-badge)
-![Windows](https://img.shields.io/badge/Windows-passing-brightgreen?style=for-the-badge&logo=windows&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-tested-brightgreen?style=for-the-badge&logo=windows&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-untested-yellow?style=for-the-badge&logo=linux&logoColor=black)
 
 
@@ -20,10 +20,36 @@ Program your shader and see it changing side by side. Written in modern C++ for 
 
 ## Gallery 
 
+![main](gallery/ui1.png)
 
+----
+![clouds](gallery/ui2.png)
+
+----
+
+Shader Credit : https://www.shadertoy.com/view/llXfRr
+
+![trees](gallery/ui3.png)
 
 
 ## Setup
+
+```powershell
+# 1. Clone the repo
+git clone https://github.com/ArcShahi/Albedo.git
+
+# 2. Go inside directory and call CMake
+cmake -B out\
+
+#  Files will be build in 'out' directory
+# 3. Call your build systerm or : 
+cmake -build out --config release
+
+# If using Visual Studio 
+#  1. Directly open the dir using it. 
+#  2. Go to CMakeLists.txt and save it. It'll build the project.
+
+```
 
 
 
