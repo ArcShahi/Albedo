@@ -6,6 +6,7 @@ in  vec2 vUv;               // texture coordinates
 uniform sampler2D uTexture; // texture slot
 uniform float uTime;        // shader playback time in seconds
 uniform vec2 uResolution;   // xy: viewport resolution in pixels
+uniform vec2 uMouse;        // xy: mouse coordinates
 
 
 void main(){

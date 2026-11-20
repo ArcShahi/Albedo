@@ -1,8 +1,8 @@
 #include <App.hpp>
 
-int main() {
+int main() { 
 
-  Rem::Albedo albedo{};
+  Albedo albedo{};
   if (!albedo.Init()) {
     return -1;
   }

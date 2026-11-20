@@ -11,7 +11,6 @@ class Shader {
 
 public:
   Shader() {};
-  ~Shader() { Destroy(); }
   void Use() const noexcept;
 
   bool IsValid() const noexcept { return handle_ != 0; }
