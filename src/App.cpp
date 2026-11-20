@@ -48,7 +48,7 @@ bool Albedo::Init() noexcept {
 #pragma region OpenGL
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cerr << "Failed to initialize GLAD !!\n";
+    Rem::LogError("GLAD: Failed to initialize !!!");
     return false;
   }
 
@@ -64,7 +64,7 @@ bool Albedo::Init() noexcept {
   // will be sampled by shader first pass
   srcTexture_ = Rem::LoadTexture(ASSETS + "/albedo.png"s);
   if (!srcTexture_.handle) {
-    std::cerr << "Can't load texture";
+    Rem::LogError("Texture not loaded !!!");
   }
 
   // Frame buffer and texture target
@@ -74,7 +74,7 @@ bool Albedo::Init() noexcept {
 
   fbo_ = Rem::CreateFrameBufferWithTexture(targetTexture_);
   if (!fbo_.handle) {
-    std::cerr << "Framebuffer fucked\n";
+    Rem::LogError("Framebuffer fucked");
     return false;
   }
 
