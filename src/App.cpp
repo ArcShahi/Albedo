@@ -208,6 +208,7 @@ void Albedo::UIRender() noexcept {
 
   ImGui::Begin("Editor");
 
+  // TODO: Don't compile if no changes in file
   if (ImGui::IsKeyPressed(ImGuiKey_F5, false)) {
       CompileFromEditor_();
   }
@@ -218,30 +219,19 @@ void Albedo::UIRender() noexcept {
 
 #pragma endregion
 
-#pragma region SHADER_INPUTS_PANEL
-
-  ImGui::Begin("Shader inputs");
-  const auto &io{ImGui::GetIO()};
-
-  ImGui::Text("%.0f FPS", io.Framerate);
-
-  ImGui::SeparatorText("Uniforms");
-  ImGui::BulletText("float      uTime        %.2f", glfwGetTime());
-  ImGui::BulletText("vec2       uResolution  %d, %d", targetTexture_.width,
-                    targetTexture_.height);
-  ImGui::BulletText("sampler2D  uTexture     unit 0 (albedo.png)");
-
-  ImGui::End();
-
-#pragma endregion
 
 #pragma region LOG_PANEL
 
   ImGui::Begin("LOG");
+  ImGui::Text("%.2f", glfwGetTime());
+  ImGui::SameLine();
+  ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+  ImGui::SameLine();
+  ImGui::Text("%d x %d", targetTexture_.width, targetTexture_.height);
 
   const ImVec4 green{0.4f, 1.0f, 0.4f, 1.0f};
   const ImVec4 red{1.0f, 0.4f, 0.4f, 1.0f};
-
+  ImGui::Separator();
   if (shader_.Log().empty()) {
     ImGui::TextColored(green, "Compiled in %.3f ms ;)", compileTime_);
   } else {

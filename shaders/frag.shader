@@ -1,12 +1,12 @@
 #version 460      
+// !! DON'T REMOVE THEM IF YOU'RE GONNA USE THEM
+out vec4 FragColor;         // Output color 
+in  vec2 vUv;               // texture coordinates
 
-// DON'T FUCK WITH THESE -_-
-out vec4 FragColor;
-in  vec2 vUv;
+uniform sampler2D uTexture; // texture slot
+uniform float uTime;        // shader playback time in seconds
+uniform vec2 uResolution;   // xy: viewport resolution in pixels
 
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
 
 void main(){
 
