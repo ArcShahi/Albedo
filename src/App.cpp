@@ -1,35 +1,26 @@
-#include "App.hpp"
+#include <App.hpp>
 
 #include <fstream>
-#include <vector>
 
 #include <languages/TextEditorGLSL.h>
+#include <ErrorLog.hpp>
+
 
 using namespace std::string_literals;
 
-namespace {
-
-namespace Color {
-// TODO ERR LOG
-constexpr auto CLEAR{"\033[0m"};
-constexpr auto RED{"\033[101m"};
-constexpr auto GREEN{"\033[102m"};
-} // namespace Color
-
-} // namespace
 
 namespace Rem {
 
 bool Albedo::Init() noexcept {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////					       GLFW INIT
+  ////    					         GLFW 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region GLFW
 
   if (!glfwInit()) {
-    std::cerr << Color::RED << "Failed to intialize GLFW !!\n" << Color::CLEAR;
+    Rem::LogError("GLFW: Initialization failed !!");
     return false;
   }
 
@@ -40,8 +31,7 @@ bool Albedo::Init() noexcept {
   window_ = glfwCreateWindow(1920, 1080, "Albedo", nullptr, nullptr);
 
   if (!window_) {
-    std::cerr << Color::RED << "Failed to initialized GLFW window !!\n"
-              << Color::CLEAR;
+    Rem::LogError("GLFW: Window init failed !!");  
     return false;
   }
 
@@ -52,7 +42,7 @@ bool Albedo::Init() noexcept {
 #pragma endregion
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
-  ////                                OpenGL
+  ////                                     OpenGL
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region OpenGL
@@ -91,7 +81,7 @@ bool Albedo::Init() noexcept {
 #pragma endregion
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
-  ////                                ImGUI
+  ////                                     ImGUI
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region IMGUI
@@ -110,7 +100,7 @@ bool Albedo::Init() noexcept {
 #pragma region EDITOR
 
   std::ifstream file(SHADERS + "/frag.shader"s);
-  std::string src{std::istreambuf_iterator<char>(file), {}};
+  const std::string src{std::istreambuf_iterator<char>(file), {}};
 
   editor_.SetLanguage(TextEditorGlsl::getDefinition());
   editor_.SetPalette(TextEditor::GetDarkPalette());
@@ -143,14 +133,15 @@ void Albedo::ShutDown() noexcept {
 }
 
 void Albedo::Run() noexcept {
+
   // LOOP LOOP BABY , LOOP LOOP BABY
-  float lastTime{static_cast<float>(glfwGetTime())};
+   float lastTime{static_cast<float>(glfwGetTime())};
 
   while (!glfwWindowShouldClose(window_)) {
     glfwPollEvents();
 
-    float currentTime{static_cast<float>(glfwGetTime())};
-    float dt{currentTime - lastTime};
+    const float currentTime{static_cast<float>(glfwGetTime())};
+    const float dt{currentTime - lastTime};
     lastTime = currentTime;
 
     Update(dt);
@@ -217,19 +208,20 @@ void Albedo::UIRender() noexcept {
 
   ImGui::Begin("Editor");
 
-  if (/*ImGui::Button("Compile") || */ImGui::IsKeyPressed(ImGuiKey_F5, false)) {
-    CompileFromEditor_();
+  if (ImGui::IsKeyPressed(ImGuiKey_F5, false)) {
+      CompileFromEditor_();
   }
 
   editor_.Render("##Fragment"); // fills the rest of the panel
 
   ImGui::End();
+
 #pragma endregion
 
 #pragma region SHADER_INPUTS_PANEL
 
   ImGui::Begin("Shader inputs");
-  const ImGuiIO &io{ImGui::GetIO()};
+  const auto &io{ImGui::GetIO()};
 
   ImGui::Text("%.0f FPS", io.Framerate);
 
@@ -300,14 +292,12 @@ Albedo::~Albedo() { ShutDown(); }
 
 void Albedo::CompileFromEditor_() noexcept {
 
-  const double start{glfwGetTime()};
+  const auto start{glfwGetTime()};
   const bool hoe{shader_.CreateShader(editor_.GetText())};
-
   compileTime_ = static_cast<float>((glfwGetTime() - start) * 1000.0f);
 
   if (!hoe) {
-    shader_.SetUniform("uTexture",
-                       0); // new shader program so have to add again
+    shader_.SetUniform("uTexture",0); // new shader program so have to add again
     showlog_ = false;
   } else {
     showlog_ = true;

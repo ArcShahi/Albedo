@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <iostream>
-#include <string>
+
 
 #include <PlatformWin32.hpp> // 1
 #include <glad/glad.h>       // 2

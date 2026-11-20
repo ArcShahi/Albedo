@@ -13,6 +13,7 @@ target_sources(albedo
         src/Main.cpp
         src/Shader.cpp
         src/Renderer.cpp
+    
         
      
      
@@ -25,6 +26,7 @@ target_sources(albedo
              include/PlatformWin32.hpp
              include/Renderer/Shader.hpp
              include/Renderer/Renderer.hpp
+             include/ErrorLog.hpp
  )
 
 

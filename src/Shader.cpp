@@ -1,9 +1,7 @@
 #include <Renderer/Shader.hpp>
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
+#include <utility>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -44,7 +42,7 @@ constexpr const char *VERTEX_SHADER_SRC{R"(
 [[nodiscard]] uint32_t CompileShader(uint32_t type, const char *src,
                                      std::string &log) {
 
-  const uint32_t handle{glCreateShader(type)};
+  const auto handle{glCreateShader(type)};
   glShaderSource(handle, 1, &src, nullptr);
   glCompileShader(handle);
 

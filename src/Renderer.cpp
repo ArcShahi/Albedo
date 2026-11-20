@@ -1,7 +1,9 @@
 #include <Renderer/Renderer.hpp>
+#include <ErrorLog.hpp>
+
 #include <stb_image.h>
 
-#include <iostream>
+
 
 namespace Rem {
 
@@ -28,12 +30,11 @@ namespace Rem {
 
   // In OpeGL texture's (0,0) is at bottom left instead of top left
   stbi_set_flip_vertically_on_load(1);
-
   uint8_t *data{stbi_load(path.c_str(), &width, &height, nullptr, 4)};
 
   if (!data) {
-    std::cerr << "Failed to load texture: " << path << "( "
-              << stbi_failure_reason() << " )\n";
+    Rem::LogError("Failed to load texture");
+    Rem::LogError(stbi_failure_reason());
     return {};
   }
 
@@ -42,7 +43,7 @@ namespace Rem {
   out.height = height;
 
   // Full mip chain- floor(log2(max(w, h))) + 1 levels
-  const int levels{
+  const auto levels{
       std::bit_width(static_cast<unsigned>(std::max(width, height)))};
 
   glCreateTextures(GL_TEXTURE_2D, 1, &out.handle);
@@ -75,7 +76,7 @@ bool AttachTextureToFrameBuffer(FrameBuffer &framebuffer,
                                 const Texture texture) noexcept {
 
   if (!framebuffer.handle || !texture.handle) {
-    std::cerr << "8nvalid framebuffer or texture\n";
+    Rem::LogError("Invalid framebuffer or texture");
     return false;
   }
 
@@ -84,7 +85,7 @@ bool AttachTextureToFrameBuffer(FrameBuffer &framebuffer,
 
   if (glCheckNamedFramebufferStatus(framebuffer.handle, GL_FRAMEBUFFER) !=
       GL_FRAMEBUFFER_COMPLETE) {
-    std::cerr << "Framebuffer is not complete!" << std::endl;
+    Rem::LogError("Framebuffer is not complete !!!");
     return false;
   }
 
