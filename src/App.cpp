@@ -2,9 +2,9 @@
 
 #include <fstream>
 
-#include <stb_image.h>
 #include <ErrorLog.hpp>
 #include <languages/TextEditorGLSL.h>
+#include <stb_image.h>
 
 using namespace std::string_literals;
 
@@ -279,9 +279,19 @@ void Albedo::UIRender() noexcept {
   viewportSize_ = {static_cast<int>(sceneAvail.x),
                    static_cast<int>(sceneAvail.y)};
 
+  ImDrawList *dl{ImGui::GetWindowDrawList()};
+  dl->AddCallback(
+      [](const ImDrawList *, const ImDrawCmd *) {
+        glDisable(GL_BLEND); // ignore alpha: draw the image as opaque
+      },
+      nullptr);
+
   // Scene: the render target, V flipped because GL textures are bottom-up
   ImGui::Image((ImTextureID)(intptr_t)targetTexture_.handle, sceneAvail,
                ImVec2(0, 1), ImVec2(1, 0));
+
+  dl->AddCallback(ImDrawCallback_ResetRenderState,
+                  nullptr); // restore ImGui's state
 
   if (ImGui::IsItemHovered()) {
     const ImVec2 min{ImGui::GetItemRectMin()};
