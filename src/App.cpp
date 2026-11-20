@@ -33,16 +33,6 @@ bool Albedo::Init() noexcept {
   }
 
   Rem::SetDarkTitleBar(window_, true);
-
-  GLFWimage icon{};
-
-  int channels{};
-  icon.pixels = stbi_load("assets/albedo.png", &icon.width, &icon.height, &channels, 4);
-
-  glfwSetWindowIcon(window_, 1, &icon);
-
-  stbi_image_free(icon.pixels);
-
   glfwMakeContextCurrent(window_);
   glfwSwapInterval(1); // vsync
 
