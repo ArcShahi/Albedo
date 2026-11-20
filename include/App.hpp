@@ -11,8 +11,8 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <imgui_stdlib.h>
 
+#include <TextEditor.h>
 
 #include <Renderer/Shader.hpp>
 #include <Renderer/Renderer.hpp>
@@ -35,21 +35,25 @@ public:
   void UIRender() noexcept;
 
   void ResizeTarget(int width,int height) noexcept;
-
-
   ~Albedo();
 
 private:
+
+	void CompileFromEditor_() noexcept;
+
+private:
+  TextEditor editor_{};
   Rem::Shader shader_{};
-  std::string fragSource_{};
   Rem::FrameBuffer fbo_{};
   Rem::Texture srcTexture_{};
   Rem::Texture targetTexture_{};
   GLFWwindow *window_{};
 
-  glm::ivec2 viewportSize_{};// Screen panel size
+  glm::ivec2 viewportSize_{};// Scene panel size inx px
 
   uint32_t vao_{};
+  float compileTime_{};
+  bool showlog_{};
 
 };
 

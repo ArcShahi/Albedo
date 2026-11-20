@@ -1,6 +1,9 @@
 #include "App.hpp"
 
 #include <fstream>
+#include <vector>
+
+#include <languages/TextEditorGLSL.h>
 
 using namespace std::string_literals;
 
@@ -12,6 +15,7 @@ constexpr auto CLEAR{"\033[0m"};
 constexpr auto RED{"\033[101m"};
 constexpr auto GREEN{"\033[102m"};
 } // namespace Color
+
 } // namespace
 
 namespace Rem {
@@ -51,6 +55,8 @@ bool Albedo::Init() noexcept {
   ////                                OpenGL
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma region OpenGL
+
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cerr << "Failed to initialize GLAD !!\n";
     return false;
@@ -82,17 +88,6 @@ bool Albedo::Init() noexcept {
     return false;
   }
 
-#pragma region SHADER
-
-  std::ifstream file(SHADERS + "/frag.shader"s);
-  fragSource_.assign(std::istreambuf_iterator<char>(file), {});
-
-  if (shader_.CreateShader(fragSource_)) {
-    shader_.SetUniform("uTexture", 0); // will be sampled from slot 0
-  } else {
-    std::cerr << shader_.Log();
-  }
-
 #pragma endregion
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +104,18 @@ bool Albedo::Init() noexcept {
   ImGui::StyleColorsDark();
   ImGui_ImplGlfw_InitForOpenGL(window_, true);
   ImGui_ImplOpenGL3_Init("#version 460");
+
+#pragma endregion
+
+#pragma region EDITOR
+
+  std::ifstream file(SHADERS + "/frag.shader"s);
+  std::string src{std::istreambuf_iterator<char>(file), {}};
+
+  editor_.SetLanguage(TextEditorGlsl::getDefinition());
+  editor_.SetPalette(TextEditor::GetDarkPalette());
+  editor_.SetText(src);
+  CompileFromEditor_();
 
 #pragma endregion
 
@@ -208,52 +215,57 @@ void Albedo::UIRender() noexcept {
 
 #pragma region EDITOR
 
-  ImGui::Begin("Source");
-  if (ImGui::Button("Compile") || ImGui::IsKeyPressed(ImGuiKey_F5)) {
-    if (shader_.CreateShader(fragSource_)) {
-      shader_.SetUniform("uTexture", 0);
-    }
+  ImGui::Begin("Editor");
+
+  if (ImGui::Button("Compile") || ImGui::IsKeyPressed(ImGuiKey_F5, false)) {
+    CompileFromEditor_();
   }
 
-  ImVec2 editorAvail{ImGui::GetContentRegionAvail()};
+  ImGui::SameLine();
+  ImGui::TextDisabled("F5");    // shortcut hint
+  editor_.Render("##Fragment"); // fills the rest of the panel
 
-  // Buffer for Editor : TODO Synatax Highlight
-  ImGui::InputTextMultiline("##Fragment", &fragSource_,
-                            ImVec2(editorAvail.x, editorAvail.y),
-                            ImGuiInputTextFlags_AllowTabInput);
   ImGui::End();
 #pragma endregion
 
+#pragma region INPUTS_PANEL
 
-#pragma region CONSOLE
-
-  ImGui::Begin("Console");
+  ImGui::Begin("Inputs");
   const ImGuiIO &io{ImGui::GetIO()};
-  const double time{glfwGetTime()};
 
-  ImGui::Text("Frame       %.0f FPS", io.Framerate);
-  ImGui::Text("Resolution  %d x %d", targetTexture_.width,
-              targetTexture_.height);
+  ImGui::Text("%.0f FPS", io.Framerate);
 
-  if (ImGui::CollapsingHeader("Inputs", ImGuiTreeNodeFlags_DefaultOpen)) {
-    ImGui::BulletText("float      uTime        %.2f", time);
-    ImGui::BulletText("vec2       uResolution  %d, %d", targetTexture_.width,
-                      targetTexture_.height);
-    ImGui::BulletText("sampler2D  uTexture     unit 0 (albedo.png)");
-  }
+  ImGui::SeparatorText("Uniforms");
+  ImGui::BulletText("float      uTime        %.2f", glfwGetTime());
+  ImGui::BulletText("vec2       uResolution  %d, %d", targetTexture_.width,
+                    targetTexture_.height);
+  ImGui::BulletText("sampler2D  uTexture     unit 0 (albedo.png)");
 
-  ImGui::SeparatorText("Log");
+  ImGui::End();
+
+#pragma endregion
+
+#pragma region LOG_PANEL
+
+  ImGui::Begin("LOG");
+
+  const ImVec4 green{0.4f, 1.0f, 0.4f, 1.0f};
+  const ImVec4 red{1.0f, 0.4f, 0.4f, 1.0f};
+
   if (shader_.Log().empty()) {
-    ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Shader is fine boiii");
+    ImGui::TextColored(green, "Compiled in %.3f ms ;)", compileTime_);
   } else {
-    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s",
-                       shader_.Log().c_str());
+    ImGui::TextColored(red, "Compile failed (%.2f ms) =_=", compileTime_);
+    ImGui::Separator();
+
+    ImGui::PushStyleColor(ImGuiCol_Text, red);
+    ImGui::TextWrapped("[ ERROR ]: %s", shader_.Log().c_str());
+    ImGui::PopStyleColor();
   }
 
   ImGui::End();
 
-#pragma endregion 
-
+#pragma endregion
 
 #pragma region SCENE
 
@@ -287,4 +299,20 @@ void Albedo::ResizeTarget(int width, int height) noexcept {
 }
 
 Albedo::~Albedo() { ShutDown(); }
+
+void Albedo::CompileFromEditor_() noexcept {
+
+  const double start{glfwGetTime()};
+  const bool hoe{shader_.CreateShader(editor_.GetText())};
+
+  compileTime_ = static_cast<float>((glfwGetTime() - start) * 1000.0f);
+
+  if (!hoe) {
+    shader_.SetUniform("uTexture",
+                       0); // new shader program so have to add again
+    showlog_ = false;
+  } else {
+    showlog_ = true;
+  }
+}
 } // namespace Rem
