@@ -11,6 +11,7 @@
 
 using namespace std::string_literals;
 
+
 bool Albedo::Init() noexcept {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +63,7 @@ bool Albedo::Init() noexcept {
   glCreateVertexArrays(1, &vao_);
 
   // will be sampled by shader first pass
-  srcTexture_ = Rem::LoadTexture(ASSETS + "/albedo.png"s);
+  srcTexture_ = Rem::LoadTexture("assets/textures/albedo.png"s);
   if (!srcTexture_.handle) {
     Rem::LogError("Texture not loaded !!!");
   }
@@ -90,7 +91,7 @@ bool Albedo::Init() noexcept {
   ImGui::CreateContext();
   ImGuiIO &io{ImGui::GetIO()};
   [[maybe_unused]] ImFont *font{io.Fonts->AddFontFromFileTTF(
-      ASSETS "/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
+      "assets/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
   ImGui::GetStyle().Colors[ImGuiCol_WindowBg] =
@@ -102,8 +103,9 @@ bool Albedo::Init() noexcept {
 
 #pragma region EDITOR
 
-  const std::string shaderPath{SHADERS + "/frag.shader"s};
-  std::ifstream file(SHADERS + "/frag.shader"s);
+ 
+  const std::string shaderPath{"shaders/albedo.shader"};
+  std::ifstream file(shaderPath);
   if (!file) {
     Rem::LogError("Can't Open"s + shaderPath);
   }

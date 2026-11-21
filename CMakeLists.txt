@@ -7,6 +7,22 @@ project(Albedo
 
 add_executable(albedo)
 
+# Copy the assets needs to run the executables
+add_custom_command(
+    TARGET albedo
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:albedo>/assets"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
+        "$<TARGET_FILE_DIR:albedo>/shaders"
+
+    VERBATIM
+)
+
+
 target_sources(albedo 
         PRIVATE 
         src/App.cpp
@@ -64,10 +80,6 @@ set(CLANG_FLAGS
     -Werror)
 
 target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:Clang>:${CLANG_FLAGS}>)
-
-# Path to assets and shader as compiler definition
-target_compile_definitions(albedo PRIVATE ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets")
-target_compile_definitions(albedo PRIVATE SHADERS="${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 
 # Link libraries
 target_link_libraries(albedo PUBLIC glm::glm glfw glad stb imgui gsns)
