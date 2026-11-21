@@ -279,7 +279,7 @@ void Albedo::UIRender() noexcept {
     ImGui::TextColored(green, "Shader compiled in %.4f secs",
                        editorInfo_.CompileTime);
   } else {
-    ImGui::TextColored(red, " Shader compilation failed !!");
+    ImGui::TextColored(red, "[ Shader compilation failed !! ]");
   }
 
   // Shder compilation erros

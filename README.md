@@ -53,7 +53,6 @@ cmake -build out --config release
 ```
 
 
-
 ## Credits
 1. TheCherno: His OpenGL series has helped me a lot and I've also learned to architech software(somewhat) from him. What I had was an overengineered , overkill abomination. The app flow is much simpler now.
 1. LearnOpenGL: What a great site to learn OpenGL 
