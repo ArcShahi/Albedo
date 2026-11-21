@@ -172,15 +172,6 @@ void Albedo::Update([[maybe_unused]] float dt) noexcept {
 
 void Albedo::Render() noexcept {
 
-#ifdef BLITZ
-  int fbw{}, fbh{};
-  glfwGetFramebufferSize(window_, &fbw, &fbh);
-  if (fbw > 0 && fbh > 0 &&
-      (fbw != targetTexture_.width || fbh != targetTexture_.height)) {
-    ResizeTarget(fbw, fbh);
-  }
-#endif
-
   // Keep the target matching the IMGUI PANEL
 
   if (viewportSize_.x > 0 && viewportSize_.y > 0 &&
@@ -212,7 +203,7 @@ void Albedo::UIRender() noexcept {
   glfwGetFramebufferSize(window_, &fbw, &fbh);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glViewport(0, 0, fbw, fbh);
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   ImGui_ImplOpenGL3_NewFrame();
@@ -221,7 +212,7 @@ void Albedo::UIRender() noexcept {
 
   ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
   const ImVec4 green{0.4f, 1.0f, 0.4f, 1.0f};
-  const ImVec4 red{1.0f, 0.4f, 0.4f, 1.0f};
+  const ImVec4 red{1.0f, 0.3f, 0.3f, 1.0f};
 
 #pragma region EDITOR_PANEL
 
@@ -279,7 +270,7 @@ void Albedo::UIRender() noexcept {
     ImGui::TextColored(green, "Shader compiled in %.4f secs",
                        editorInfo_.CompileTime);
   } else {
-    ImGui::TextColored(red, "[ Shader compilation failed !! ]");
+    ImGui::TextColored(red, "Shader compilation failed !!");
   }
 
   // Shder compilation erros
