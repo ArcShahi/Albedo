@@ -1,4 +1,5 @@
 #include <Renderer/Shader.hpp>
+#include <ErrorLog.hpp>
 
 #include <string>
 #include <string_view>
@@ -11,7 +12,7 @@ namespace Rem {
 
 namespace {
 
-#pragma region RAW_SHADERS
+#pragma region VERTEX_SHADERS
 
 // Don't even touch it
 constexpr std::string_view VERTEX_SHADER_SRC{R"(
@@ -23,8 +24,10 @@ constexpr std::string_view VERTEX_SHADER_SRC{R"(
   gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
 })"};
 
-constexpr std::string_view FRAG_UNIFORMS{R"(
-#version 460 core
+#pragma endregion
+
+[[nodiscard]] std::string PreproessSource(std::string_view src) noexcept {
+  static constexpr std::string_view prelude{R"(#version 460 core
 out vec4 FragColor;
 in vec2 vUv;
 uniform sampler2D uTexture;
@@ -33,7 +36,13 @@ uniform vec2 uResolution;
 uniform vec2 uMouse;
 )"};
 
-#pragma endregion
+  std::string fragsrc{};
+  fragsrc.reserve(prelude.size() + src.size() + 16);
+  fragsrc += prelude;
+  fragsrc += "#line 1\n"; // the next line is editor line 1
+  fragsrc += src;
+  return fragsrc;
+}
 
 [[nodiscard]] std::string InfoLog(const uint32_t &handle, bool isProgram) {
 
@@ -100,12 +109,12 @@ void Shader::Destroy() noexcept {
 }
 
 // Create the shader program
-bool Shader::CreateShader(const std::string &fragsrc) noexcept {
+bool Shader::CreateShader(const std::string &src) noexcept {
 
   std::string log{};
-  const uint32_t vs{CompileShader(GL_VERTEX_SHADER, VERTEX_SHADER_SRC.data(), log)};
-  const uint32_t fs {CompileShader(GL_FRAGMENT_SHADER, 
-       (FRAG_UNIFORMS.data() + fragsrc).c_str(), log)};
+  const auto fragsrc{PreproessSource(src)};
+  const auto vs{CompileShader(GL_VERTEX_SHADER, VERTEX_SHADER_SRC.data(), log)};
+  const auto fs{CompileShader(GL_FRAGMENT_SHADER, fragsrc.c_str(), log)};
 
   if (!fs || !vs) {
     log_ = std::move(log);
@@ -114,7 +123,7 @@ bool Shader::CreateShader(const std::string &fragsrc) noexcept {
     return false;
   }
 
-  const uint32_t program{glCreateProgram()};
+  const auto program{glCreateProgram()};
   glAttachShader(program, fs);
   glAttachShader(program, vs);
   glLinkProgram(program);

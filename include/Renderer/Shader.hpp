@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <ErrorLog.hpp>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
@@ -17,7 +16,7 @@ public:
   bool IsValid() const noexcept { return handle_ != 0; }
   void Destroy() noexcept;
 
-  [[nodiscard]] bool CreateShader(const std::string &fragsrc) noexcept;
+  [[nodiscard]] bool CreateShader(const std::string &src) noexcept;
 
   // Sets the value of uniform vec4
   void SetUniform(const std::string& name, glm::vec4 val) const noexcept;
