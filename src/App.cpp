@@ -1,17 +1,15 @@
 #include <App.hpp>
 
-#include <fstream>
-#include <format>
 #include <chrono>
 #include <filesystem>
+#include <format>
+#include <fstream>
 #include <system_error>
 
 #include <ErrorLog.hpp>
 #include <GlslTheme.hpp>
 
-
 using namespace std::string_literals;
-
 
 bool Albedo::Init() noexcept {
 
@@ -87,6 +85,7 @@ bool Albedo::Init() noexcept {
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region IMGUI
+
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io{ImGui::GetIO()};
@@ -94,7 +93,8 @@ bool Albedo::Init() noexcept {
       ASSETS "/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
-  ImGui::GetStyle().Colors[ImGuiCol_WindowBg] =ImVec4(0.051f, 0.067f, 0.090f, 1.0f);
+  ImGui::GetStyle().Colors[ImGuiCol_WindowBg] =
+      ImVec4(0.051f, 0.067f, 0.090f, 1.0f);
   ImGui_ImplGlfw_InitForOpenGL(window_, true);
   ImGui_ImplOpenGL3_Init("#version 460");
 
@@ -163,12 +163,11 @@ void Albedo::Run() noexcept {
 
     glfwSwapBuffers(window_);
   }
-  SaveSession_();
 }
 
 void Albedo::Update([[maybe_unused]] float dt) noexcept {
   if (ImGui::IsKeyPressed(ImGuiKey_F11, false))
-      ToggleFullscreen_();
+    ToggleFullscreen_();
 }
 
 void Albedo::Render() noexcept {
@@ -238,6 +237,10 @@ void Albedo::UIRender() noexcept {
     CompileFromEditor_();
   }
 
+  if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S)) {
+    SaveShader_();
+  }
+
   editor_.Render("##Fragment"); // fills the rest of the panel
 
   ImGui::End();
@@ -246,22 +249,24 @@ void Albedo::UIRender() noexcept {
 
 #pragma region INFO_PANEL
 
- ImGui::Begin("Info");
- ImGui::TextColored(green, "OPENGL VENDOR : %s %s",glGetString(GL_VENDOR),glGetString(GL_VERSION));
- ImGui::TextColored(green, "OpenGL version 4.6 Core");
- ImGui::Spacing();
+  ImGui::Begin("Info");
+  ImGui::TextColored(green, "OPENGL VENDOR : %s %s", glGetString(GL_VENDOR),
+                     glGetString(GL_VERSION));
+  ImGui::TextColored(green, "OpenGL version 4.6 Core");
+  ImGui::Spacing();
 
- ImGui::SeparatorText("Shader Inputs");
- ImGui::Text("out vec4 FragColor;         // Output color ");
- ImGui::Text("in  vec2 vUv;               // texture coordinates");
- ImGui::Text("uniform sampler2D uTexture; // texture slot 0");
- ImGui::Text("uniform float uTime;        // shader playback time in seconds");
- ImGui::Text("uniform vec2 uResolution;   // xy: viewport resolution in pixels");
- ImGui::Text("uniform vec2 uResolution;   // xy: viewport resolution in pixels");
- ImGui::Text("uniform vec2 uMouse;        // xy");
+  ImGui::SeparatorText("Shader Inputs");
+  ImGui::Text("out vec4 FragColor;         // Output color ");
+  ImGui::Text("in  vec2 vUv;               // texture coordinates");
+  ImGui::Text("uniform sampler2D uTexture; // texture slot 0");
+  ImGui::Text("uniform float uTime;        // shader playback time in seconds");
+  ImGui::Text(
+      "uniform vec2 uResolution;   // xy: viewport resolution in pixels");
+  ImGui::Text(
+      "uniform vec2 uResolution;   // xy: viewport resolution in pixels");
+  ImGui::Text("uniform vec2 uMouse;        // xy");
 
-
- ImGui::End();
+  ImGui::End();
 #pragma endregion
 
 #pragma region OUTPUT_PANEL
@@ -271,7 +276,8 @@ void Albedo::UIRender() noexcept {
   if (glfwGetTime() - editorInfo_.SkippedTime <= 2.0) {
     ImGui::TextDisabled("...You din't changed anything");
   } else if (shader_.Log().empty()) {
-    ImGui::TextColored(green, "Shader compiled in %.4f secs",editorInfo_.CompileTime);
+    ImGui::TextColored(green, "Shader compiled in %.4f secs",
+                       editorInfo_.CompileTime);
   } else {
     ImGui::TextColored(red, " Shader compilation failed !!");
   }
@@ -283,7 +289,7 @@ void Albedo::UIRender() noexcept {
     ImGui::TextWrapped("%s ", shader_.Log().c_str());
     ImGui::PopStyleColor();
   }
- 
+
   ImGui::End();
 
 #pragma endregion
@@ -380,10 +386,9 @@ void Albedo::CompileFromEditor_() noexcept {
   editorInfo_.Dirty = false;
 
   const auto start{glfwGetTime()};
-  editorInfo_.Compiled=shader_.CreateShader(editor_.GetText());
-  // compile time in seconds, seems faster 
-  editorInfo_.CompileTime =
-      static_cast<float>((glfwGetTime() - start));
+  editorInfo_.Compiled = shader_.CreateShader(editor_.GetText());
+  // compile time in seconds, seems faster
+  editorInfo_.CompileTime = static_cast<float>((glfwGetTime() - start));
 
   if (editorInfo_.Compiled) {
     shader_.SetUniform("uTexture",
@@ -391,30 +396,27 @@ void Albedo::CompileFromEditor_() noexcept {
   }
 }
 
-void Albedo::SaveSession_() noexcept {
+void Albedo::SaveShader_() noexcept {
 
-     namespace fs = std::filesystem;
+  namespace fs = std::filesystem;
 
-     if (editor_.GetUndoIndex() == 0 && editorInfo_.Compiled)
-     {
-       return;  // yeah,yeah made huge changes....
-     }
+  if (editor_.GetUndoIndex() == 0 && editorInfo_.Compiled) {
+    return; // yeah,yeah made huge changes....
+  }
 
-  
-  const std::chrono::zoned_time now{
-         std::chrono::current_zone(),
-         std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now())};
+  const std::chrono::zoned_time now{std::chrono::current_zone(),
+                                    std::chrono::floor<std::chrono::seconds>(
+                                        std::chrono::system_clock::now())};
   const std::string timestamp{std::format("{:%Y-%m-%d_%H-%M-%S}", now)};
 
-    const fs::path dir{"history"};
-     std::error_code ec{};
-    fs::create_directories(dir, ec);
+  const fs::path dir{"Shaders"};
+  std::error_code ec{};
+  fs::create_directories(dir, ec);
 
-   std::ofstream out(dir / (timestamp + ".frag.shader"), std::ios::binary);
-    if (out) {
-      out << editor_.GetText();
-    } else {
-      Rem::LogError("Couldn't write to file");
-    }
-
+  std::ofstream out(dir / (timestamp + ".frag.shader"), std::ios::binary);
+  if (out) {
+    out << editor_.GetText();
+  } else {
+    Rem::LogError("Couldn't write to file");
+  }
 }

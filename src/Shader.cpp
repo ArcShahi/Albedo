@@ -1,6 +1,7 @@
 #include <Renderer/Shader.hpp>
 
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <glad/glad.h>
@@ -10,11 +11,10 @@ namespace Rem {
 
 namespace {
 
-
 #pragma region RAW_SHADERS
 
 // Don't even touch it
-constexpr const char *VERTEX_SHADER_SRC{R"(
+constexpr std::string_view VERTEX_SHADER_SRC{R"(
  #version 460 core
  out vec2 vUv;
  void main() {
@@ -23,17 +23,15 @@ constexpr const char *VERTEX_SHADER_SRC{R"(
   gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
 })"};
 
-
-constexpr const char *FRAG_UNIFORMS{R"(
-#version 460      
-out vec4 FragColor; 
-in  vec2 vUv;
-uniform sampler2D uTexture; 
+constexpr std::string_view FRAG_UNIFORMS{R"(
+#version 460 core
+out vec4 FragColor;
+in vec2 vUv;
+uniform sampler2D uTexture;
 uniform float uTime;
 uniform vec2 uResolution;
 uniform vec2 uMouse;
 )"};
-
 
 #pragma endregion
 
@@ -101,13 +99,13 @@ void Shader::Destroy() noexcept {
   uniformLocationCache_.clear();
 }
 
-// Create the shader program 
+// Create the shader program
 bool Shader::CreateShader(const std::string &fragsrc) noexcept {
 
   std::string log{};
-  const uint32_t vs{CompileShader(GL_VERTEX_SHADER, VERTEX_SHADER_SRC, log)};
-  const uint32_t fs{CompileShader(
-      GL_FRAGMENT_SHADER, std::string(FRAG_UNIFORMS + fragsrc).c_str(), log)};
+  const uint32_t vs{CompileShader(GL_VERTEX_SHADER, VERTEX_SHADER_SRC.data(), log)};
+  const uint32_t fs {CompileShader(GL_FRAGMENT_SHADER, 
+       (FRAG_UNIFORMS.data() + fragsrc).c_str(), log)};
 
   if (!fs || !vs) {
     log_ = std::move(log);
@@ -141,7 +139,6 @@ bool Shader::CreateShader(const std::string &fragsrc) noexcept {
   log_.clear();
   return true;
 }
-
 
 void Shader::SetUniform(const std::string &name, glm::vec4 val) const noexcept {
   glUniform4f(GetUniformLocation_(name.c_str()), val.x, val.y, val.z, val.w);

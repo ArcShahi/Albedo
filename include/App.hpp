@@ -52,7 +52,7 @@ public:
 private:
   void ToggleFullscreen_() noexcept;
   void CompileFromEditor_() noexcept;
-  void SaveSession_() noexcept;
+  void SaveShader_() noexcept;
 
 
 private:
