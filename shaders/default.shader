@@ -1,13 +1,3 @@
-#version 460
-// !! DON'T REMOVE THEM IF YOU'RE GONNA USE THEM
-out vec4 FragColor;         // Output color 
-in  vec2 vUv;               // texture coordinates
-
-uniform sampler2D uTexture; // texture slot
-uniform float uTime;        // shader playback time in seconds
-uniform vec2 uResolution;   // xy: viewport resolution in pixels
-uniform vec2 uMouse;        // xy: mouse coordinates
-
 
 void main() {
 

@@ -14,23 +14,24 @@ Program your shader and see it changing side by side. Written in modern C++ for 
 ## Features
 - Fast shader compilation and rendering 
 - Resizable panels : editors, scene , log 
-- Syntax highlighting and error message.
+- Github like syntax highlighting and error message.
 - Dark window title bar ( I'm so proud of this ) 
 
 
 ## Gallery 
 
-![main](gallery/ui1.png)
-
-----
-![clouds](gallery/ui2.png)
+![main](gallery/ui0.png)
 
 ----
 
-Shader Credit : https://www.shadertoy.com/view/llXfRr
+**Shader Credit** : https://www.shadertoy.com/view/llXfRr
 
-![trees](gallery/ui3.png)
+![tree](gallery/ui1.png)
 
+
+**Shader credit** : https://www.shadertoy.com/view/4tdSWr
+
+![cloud](gallery/ui2.png)
 
 ## Setup
 
@@ -78,6 +79,7 @@ AI usage for Code generation and documentation is forbidden for this project.
 The follwing are  LLM generated : 
 - `dependencies.cmake` 
 - `CMakePresets.json` 
+- `GlslTheme.hpp`
 - CMLs in Vendors directories.
 
 
