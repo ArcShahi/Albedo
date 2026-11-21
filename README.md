@@ -3,6 +3,8 @@
 ![Version](https://img.shields.io/badge/Version-1.0-blue?style=for-the-badge)
 ![Windows](https://img.shields.io/badge/Windows-tested-brightgreen?style=for-the-badge&logo=windows&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-untested-yellow?style=for-the-badge&logo=linux&logoColor=black)
+![Issues](https://img.shields.io/github/issues/ArcShahi/Albedo?style=for-the-badge&logo=github)
+![Latest Release](https://img.shields.io/github/v/release/ArcShahi/Albedo?style=for-the-badge&logo=github)
 
 
 
@@ -86,9 +88,7 @@ The follwing are  LLM generated :
 
 
 ## TODO
-- Optimize shader compilation
-- Maybe multithreading
 - Mulipass : I'll not add it until I am able to create some shader art that does require multipass.
-- Some bugs
+
 
 ----
