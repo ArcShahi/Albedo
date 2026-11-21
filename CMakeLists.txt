@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.2)
 project(Albedo 
-    VERSION 1.0
+    VERSION 1.1
     DESCRIPTION "Albedo : simple opengl framework"
     LANGUAGES CXX
 )
@@ -14,9 +14,6 @@ target_sources(albedo
         src/Shader.cpp
         src/Renderer.cpp
     
-        
-     
-     
         # Can't have this...
         PRIVATE  
           FILE_SET HEADERS 

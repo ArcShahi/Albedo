@@ -1,6 +1,6 @@
 <h1 align="center">Albedo</h1>
 
-![Version](https://img.shields.io/badge/Version-1.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.1-blue?style=for-the-badge)
 ![Windows](https://img.shields.io/badge/Windows-tested-brightgreen?style=for-the-badge&logo=windows&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-untested-yellow?style=for-the-badge&logo=linux&logoColor=black)
 ![Issues](https://img.shields.io/github/issues/ArcShahi/Albedo?style=for-the-badge&logo=github)
