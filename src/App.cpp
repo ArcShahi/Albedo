@@ -238,37 +238,52 @@ void Albedo::UIRender() noexcept {
     CompileFromEditor_();
   }
 
-  const float footerY{ImGui::GetFrameHeightWithSpacing()};
-  ImGui::BeginChild("##editorArea", ImVec2(0, -footerY), ImGuiChildFlags_None,
-                    ImGuiWindowFlags_NoScrollbar |
-                        ImGuiWindowFlags_NoScrollWithMouse);
-
   editor_.Render("##Fragment"); // fills the rest of the panel
-  ImGui::EndChild();
-
-  ImGui::Separator();
-  ImGui::Separator();
-  if (glfwGetTime() - editorInfo_.SkippedTime < 2.0)
-    ImGui::TextDisabled("No changes since last compile");
-  else if (shader_.Log().empty())
-    ImGui::TextColored(green, "Compiled in %.2f ms", editorInfo_.CompileTime);
-  else
-    ImGui::TextColored(red, "Compile failed (see log)");
 
   ImGui::End();
+
 #pragma endregion
 
-#pragma region LOG_PANEL
+#pragma region INFO_PANEL
 
-  ImGui::Begin("LOG");
+ ImGui::Begin("Info");
+ ImGui::TextColored(green, "OPENGL VENDOR : %s %s",glGetString(GL_VENDOR),glGetString(GL_VERSION));
+ ImGui::TextColored(green, "OpenGL version 4.6 Core");
+ ImGui::Spacing();
 
-  if (shader_.Log().empty()) {
-    ImGui::TextDisabled("No errors");
+ ImGui::SeparatorText("Shader Inputs");
+ ImGui::Text("out vec4 FragColor;         // Output color ");
+ ImGui::Text("in  vec2 vUv;               // texture coordinates");
+ ImGui::Text("uniform sampler2D uTexture; // texture slot 0");
+ ImGui::Text("uniform float uTime;        // shader playback time in seconds");
+ ImGui::Text("uniform vec2 uResolution;   // xy: viewport resolution in pixels");
+ ImGui::Text("uniform vec2 uResolution;   // xy: viewport resolution in pixels");
+ ImGui::Text("uniform vec2 uMouse;        // xy");
+
+
+ ImGui::End();
+#pragma endregion
+
+#pragma region OUTPUT_PANEL
+
+  ImGui::Begin("Output");
+
+  if (glfwGetTime() - editorInfo_.SkippedTime <= 2.0) {
+    ImGui::TextDisabled("...You din't changed anything");
+  } else if (shader_.Log().empty()) {
+    ImGui::TextColored(green, "Shader compiled in %.4f secs",editorInfo_.CompileTime);
   } else {
+    ImGui::TextColored(red, " Shader compilation failed !!");
+  }
+
+  // Shder compilation erros
+  if (!shader_.Log().empty()) {
+    ImGui::Separator();
     ImGui::PushStyleColor(ImGuiCol_Text, red);
-    ImGui::TextWrapped("%s", shader_.Log().c_str());
+    ImGui::TextWrapped("%s ", shader_.Log().c_str());
     ImGui::PopStyleColor();
   }
+ 
   ImGui::End();
 
 #pragma endregion
@@ -366,8 +381,9 @@ void Albedo::CompileFromEditor_() noexcept {
 
   const auto start{glfwGetTime()};
   const bool ok{shader_.CreateShader(editor_.GetText())};
+  // compile time in seconds, seems faster 
   editorInfo_.CompileTime =
-      static_cast<float>((glfwGetTime() - start) * 1000.0f);
+      static_cast<float>((glfwGetTime() - start));
 
   if (ok) {
     shader_.SetUniform("uTexture",
