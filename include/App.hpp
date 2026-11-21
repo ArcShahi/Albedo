@@ -59,6 +59,7 @@ private:
   TextEditor editor_{};
   Rem::Shader shader_{};
   Rem::FrameBuffer fbo_{};
+  EditorInfo editorInfo_{};
   WindowInfo windowInfo{};
   Rem::Texture srcTexture_{};
   Rem::Texture targetTexture_{};
@@ -66,6 +67,5 @@ private:
 
   glm::ivec2 viewportSize_{}; // Scene panel size inx px
   glm::vec2 mouse_{};
-  EditorInfo editorInfo_{};
   uint32_t vao_{};
 };
