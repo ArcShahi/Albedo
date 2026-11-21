@@ -168,7 +168,7 @@ void Albedo::Run() noexcept {
 
 void Albedo::Update([[maybe_unused]] float dt) noexcept {
   if (ImGui::IsKeyPressed(ImGuiKey_F11, false))
-    ToggleFullscreen_();
+      ToggleFullscreen_();
 }
 
 void Albedo::Render() noexcept {
@@ -380,12 +380,12 @@ void Albedo::CompileFromEditor_() noexcept {
   editorInfo_.Dirty = false;
 
   const auto start{glfwGetTime()};
-  const bool ok{shader_.CreateShader(editor_.GetText())};
+  editorInfo_.Compiled=shader_.CreateShader(editor_.GetText());
   // compile time in seconds, seems faster 
   editorInfo_.CompileTime =
       static_cast<float>((glfwGetTime() - start));
 
-  if (ok) {
+  if (editorInfo_.Compiled) {
     shader_.SetUniform("uTexture",
                        0); // new shader program so have to add again
   }
@@ -395,7 +395,7 @@ void Albedo::SaveSession_() noexcept {
 
      namespace fs = std::filesystem;
 
-     if (editor_.GetUndoIndex() == 0)
+     if (editor_.GetUndoIndex() == 0 && editorInfo_.Compiled)
      {
        return;  // yeah,yeah made huge changes....
      }

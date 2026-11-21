@@ -22,6 +22,7 @@ struct EditorInfo {
   float CompileTime{};
   float SkippedTime{-100.0};
   bool Dirty{true};
+  bool Compiled{true};
 };
 
 struct WindowInfo {
