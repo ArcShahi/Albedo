@@ -104,7 +104,7 @@ bool Albedo::Init() noexcept {
 #pragma region EDITOR
 
  
-  const std::string shaderPath{"shaders/albedo.shader"};
+  const std::string shaderPath{"shaders/default.shader"};
   std::ifstream file(shaderPath);
   if (!file) {
     Rem::LogError("Can't Open"s + shaderPath);
@@ -400,9 +400,9 @@ void Albedo::SaveShader_() noexcept {
   const std::chrono::zoned_time now{std::chrono::current_zone(),
                                     std::chrono::floor<std::chrono::seconds>(
                                         std::chrono::system_clock::now())};
-  const std::string timestamp{std::format("{:%Y-%m-%d_%H-%M-%S}", now)};
+  const auto timestamp{std::format("{:%Y%m%d_%H%M%S}", now)};
 
-  const fs::path dir{"Shaders"};
+  const fs::path dir{"saves"};
   std::error_code ec{};
   fs::create_directories(dir, ec);
 

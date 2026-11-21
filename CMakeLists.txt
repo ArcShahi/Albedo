@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 4.2)
 project(Albedo 
     VERSION 1.1
-    DESCRIPTION "Albedo : simple opengl framework"
+    DESCRIPTION "Albedo : Fragment shader renderer and editor"
     LANGUAGES CXX
 )
 

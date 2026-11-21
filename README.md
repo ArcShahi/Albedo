@@ -8,10 +8,23 @@
 
 
 
-GLSL fragment shader renderer and editor.
+GLSL Fragment shader renderer and editor.
 
 
-Program your shader and see it changing side by side. Written in modern C++ for speed.
+Program your shader and see it changing side by side. Written in modern C++ and Modern OpenGL 4.6 Core for speed.
+
+### Usage
+When on editor window : 
+- Compile with F5 
+- `CTRL + S` to save 
+
+>[!TIP]
+> **Run using the dedicated GPU.**
+>
+> On Windows, navigate to:
+> `Settings > System > Display > Graphics` : Custom settings for applications.
+>
+> Add `albedo.exe` and set its GPU preference to **High performance**, if available.
 
 ## Features
 - Fast shader compilation and rendering 
@@ -22,7 +35,7 @@ Program your shader and see it changing side by side. Written in modern C++ for 
 
 ## Gallery 
 
-![default](gallery/default.png)
+![frag](gallery/frag.png)
 
 ----
 
