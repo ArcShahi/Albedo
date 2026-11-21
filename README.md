@@ -20,18 +20,18 @@ Program your shader and see it changing side by side. Written in modern C++ for 
 
 ## Gallery 
 
-![default](gallery/ui0.png)
+![default](gallery/default.png)
 
 ----
 
 **Shader Credit** : https://www.shadertoy.com/view/llXfRr
 
-![tree](gallery/ui1.png)
+![trees](gallery/trees.png)
 
 
 **Shader credit** : https://www.shadertoy.com/view/4tdSWr
 
-![cloud](gallery/ui2.png)
+![cloud](gallery/cloud.png)
 
 ## Setup
 
