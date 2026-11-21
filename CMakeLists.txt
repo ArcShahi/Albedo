@@ -27,6 +27,7 @@ target_sources(albedo
              include/Renderer/Shader.hpp
              include/Renderer/Renderer.hpp
              include/ErrorLog.hpp
+             include/GlslTheme.hpp
 )
 
 if(WIN32)

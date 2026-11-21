@@ -7,10 +7,11 @@
 #include <system_error>
 
 #include <ErrorLog.hpp>
-#include <languages/TextEditorGLSL.h>
+#include <GlslTheme.hpp>
 
 
 using namespace std::string_literals;
+
 
 bool Albedo::Init() noexcept {
 
@@ -93,6 +94,7 @@ bool Albedo::Init() noexcept {
       ASSETS "/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
+  ImGui::GetStyle().Colors[ImGuiCol_WindowBg] =ImVec4(0.051f, 0.067f, 0.090f, 1.0f);
   ImGui_ImplGlfw_InitForOpenGL(window_, true);
   ImGui_ImplOpenGL3_Init("#version 460");
 
@@ -107,8 +109,8 @@ bool Albedo::Init() noexcept {
   }
 
   const std::string src{std::istreambuf_iterator<char>(file), {}};
-  editor_.SetLanguage(TextEditorGlsl::getDefinition());
-  editor_.SetPalette(TextEditor::GetDarkPalette());
+  editor_.SetLanguage(Rem::GlslLang());
+  editor_.SetPalette(Rem::GithubDarkPalette());
 
   editor_.SetText(src);
   CompileFromEditor_();
