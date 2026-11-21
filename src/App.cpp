@@ -1,10 +1,14 @@
 #include <App.hpp>
 
 #include <fstream>
+#include <format>
+#include <chrono>
+#include <filesystem>
+#include <system_error>
 
 #include <ErrorLog.hpp>
 #include <languages/TextEditorGLSL.h>
-#include <stb_image.h>
+
 
 using namespace std::string_literals;
 
@@ -157,6 +161,7 @@ void Albedo::Run() noexcept {
 
     glfwSwapBuffers(window_);
   }
+  SaveSession_();
 }
 
 void Albedo::Update([[maybe_unused]] float dt) noexcept {
@@ -366,4 +371,32 @@ void Albedo::CompileFromEditor_() noexcept {
     shader_.SetUniform("uTexture",
                        0); // new shader program so have to add again
   }
+}
+
+void Albedo::SaveSession_() noexcept {
+
+     namespace fs = std::filesystem;
+
+     if (editor_.GetUndoIndex() == 0)
+     {
+       return;  // yeah,yeah made huge changes....
+     }
+
+  
+  const std::chrono::zoned_time now{
+         std::chrono::current_zone(),
+         std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now())};
+  const std::string timestamp{std::format("{:%Y-%m-%d_%H-%M-%S}", now)};
+
+    const fs::path dir{"history"};
+     std::error_code ec{};
+    fs::create_directories(dir, ec);
+
+   std::ofstream out(dir / (timestamp + ".frag.shader"), std::ios::binary);
+    if (out) {
+      out << editor_.GetText();
+    } else {
+      Rem::LogError("Couldn't write to file");
+    }
+
 }

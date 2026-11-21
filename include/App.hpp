@@ -51,6 +51,8 @@ public:
 private:
   void ToggleFullscreen_() noexcept;
   void CompileFromEditor_() noexcept;
+  void SaveSession_() noexcept;
+
 
 private:
   TextEditor editor_{};

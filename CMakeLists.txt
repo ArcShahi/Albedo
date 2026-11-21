@@ -45,9 +45,9 @@ target_compile_features(albedo PRIVATE cxx_std_23)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 
 # Remove console window
-target_link_options(albedo PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>
-)
+#target_link_options(albedo PRIVATE
+#    $<$<CXX_COMPILER_ID:MSVC>:/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>
+#)
 
 # MSVC FLags
 target_compile_options(albedo PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP;/W4;/Ox;/WX;/permissive>)
