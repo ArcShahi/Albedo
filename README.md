@@ -86,11 +86,6 @@ The follwing are  LLM generated :
 > Shahi ( *prefers natural stupidity over artifical intelligence*)
 
 
-## Known Issues
-
-- Wrong line number for shader compile error
-
-
 ## TODO
 - Optimize shader compilation
 - Maybe multithreading
