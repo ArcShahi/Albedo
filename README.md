@@ -20,7 +20,7 @@ Program your shader and see it changing side by side. Written in modern C++ for 
 
 ## Gallery 
 
-![main](gallery/ui0.png)
+![default](gallery/ui0.png)
 
 ----
 
@@ -84,6 +84,11 @@ The follwing are  LLM generated :
 
 
 > Shahi ( *prefers natural stupidity over artifical intelligence*)
+
+
+## Known Issues
+
+- Wrong line number for shader compile error
 
 
 ## TODO
