@@ -7,7 +7,8 @@ project(Albedo
 
 add_executable(albedo)
 
-# Copy the assets needs to run the executables
+
+# Copy the assets needed to run the executables
 add_custom_command(
     TARGET albedo
     POST_BUILD
