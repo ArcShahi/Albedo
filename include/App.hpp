@@ -28,8 +28,8 @@ struct EditorInfo {
 
 struct WindowInfo {
 
-  glm::ivec2 pos{100, 100};
-  glm::ivec2 size{1920, 1080};
+  glm::ivec2 Pos{100, 100};
+  glm::ivec2 Size{1920, 1080};
 };
 
 } // namespace

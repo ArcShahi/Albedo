@@ -9,12 +9,12 @@
 namespace Rem {
 
 struct Texture {
-  uint32_t handle{}, width{}, height{};
+  uint32_t Handle{}, Width{}, Height{};
 };
 
 struct FrameBuffer {
-  Texture colorAttachment{};
-  uint32_t handle{};
+  Texture ColorAttachment{};
+  uint32_t Handle{};
 };
 
 [[nodiscard]] Texture CreateTexture(int width, int height) noexcept;

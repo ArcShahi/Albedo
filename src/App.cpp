@@ -64,7 +64,7 @@ bool Albedo::Init() noexcept {
 
   // will be sampled by shader first pass
   srcTexture_ = Rem::LoadTexture("assets/textures/albedo.png"s);
-  if (!srcTexture_.handle) {
+  if (!srcTexture_.Handle) {
     Rem::LogError("Texture not loaded !!!");
   }
 
@@ -74,7 +74,7 @@ bool Albedo::Init() noexcept {
   targetTexture_ = Rem::CreateTexture(fbw, fbh);
 
   fbo_ = Rem::CreateFrameBufferWithTexture(targetTexture_);
-  if (!fbo_.handle) {
+  if (!fbo_.Handle) {
     Rem::LogError("Framebuffer fucked");
     return false;
   }
@@ -176,22 +176,22 @@ void Albedo::Render() noexcept {
   // Keep the target matching the IMGUI PANEL
 
   if (viewportSize_.x > 0 && viewportSize_.y > 0 &&
-      (viewportSize_.x != static_cast<int>(targetTexture_.width) ||
-       viewportSize_.y != static_cast<int>(targetTexture_.height))) {
+      (viewportSize_.x != static_cast<int>(targetTexture_.Width) ||
+       viewportSize_.y != static_cast<int>(targetTexture_.Height))) {
     ResizeTarget(viewportSize_.x, viewportSize_.y);
   }
 
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo_.handle);
-  glViewport(0, 0, targetTexture_.width, targetTexture_.height);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_.Handle);
+  glViewport(0, 0, targetTexture_.Width, targetTexture_.Height);
 
   if (shader_.IsValid()) {
     shader_.Use();
     shader_.SetUniform("uTime", static_cast<float>(glfwGetTime()));
-    shader_.SetUniform("uResolution", static_cast<float>(targetTexture_.width),
-                       static_cast<float>(targetTexture_.height));
+    shader_.SetUniform("uResolution", static_cast<float>(targetTexture_.Width),
+                       static_cast<float>(targetTexture_.Height));
     shader_.SetUniform("uMouse", mouse_.x, mouse_.y);
 
-    glBindTextureUnit(0, srcTexture_.handle);
+    glBindTextureUnit(0, srcTexture_.Handle);
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);
   }
@@ -332,7 +332,7 @@ void Albedo::UIRender() noexcept {
       nullptr);
 
   // Scene: the render target, V flipped because GL textures are bottom-up
-  ImGui::Image((ImTextureID)(intptr_t)targetTexture_.handle, sceneAvail,
+  ImGui::Image((ImTextureID)(intptr_t)targetTexture_.Handle, sceneAvail,
                ImVec2(0, 1), ImVec2(1, 0));
 
   // restore ImGui's state
@@ -343,14 +343,14 @@ void Albedo::UIRender() noexcept {
     const ImVec2 size{ImGui::GetItemRectSize()};
     const ImVec2 m{ImGui::GetMousePos()};
 
-    mouse_ = {(m.x - min.x) / size.x * targetTexture_.width,
-              (1.0f - (m.y - min.y) / size.y) * targetTexture_.height};
+    mouse_ = {(m.x - min.x) / size.x * targetTexture_.Width,
+              (1.0f - (m.y - min.y) / size.y) * targetTexture_.Height};
   }
 
   // Resolution, Fps , Runtime
   ImGui::Indent(8.0f);
-  ImGui::Text("%d x %d   |   %.0f FPS   |   %.2f s", targetTexture_.width,
-              targetTexture_.height, ImGui::GetIO().Framerate, glfwGetTime());
+  ImGui::Text("%d x %d   |   %.0f FPS   |   %.2f s", targetTexture_.Width,
+              targetTexture_.Height, ImGui::GetIO().Framerate, glfwGetTime());
   ImGui::Unindent(8.0f);
 
   ImGui::End();
@@ -379,11 +379,11 @@ Albedo::~Albedo() { ShutDown(); }
 void Albedo::ToggleFullscreen_() noexcept {
 
   if (glfwGetWindowMonitor(window_)) {
-    glfwSetWindowMonitor(window_, nullptr, windowInfo.pos.x, windowInfo.pos.y,
-                         windowInfo.size.x, windowInfo.size.y, 0);
+    glfwSetWindowMonitor(window_, nullptr, windowInfo.Pos.x, windowInfo.Pos.y,
+                         windowInfo.Size.x, windowInfo.Size.y, 0);
   } else {
-    glfwGetWindowPos(window_, &windowInfo.pos.x, &windowInfo.pos.y);
-    glfwGetWindowSize(window_, &windowInfo.size.x, &windowInfo.size.y);
+    glfwGetWindowPos(window_, &windowInfo.Pos.x, &windowInfo.Pos.y);
+    glfwGetWindowSize(window_, &windowInfo.Size.x, &windowInfo.Size.y);
 
     GLFWmonitor *monitor{glfwGetPrimaryMonitor()};
     const GLFWvidmode *mode{glfwGetVideoMode(monitor)};
