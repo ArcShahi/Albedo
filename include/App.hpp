@@ -21,6 +21,7 @@ struct EditorInfo {
   uint32_t LastUndoIndex{};
   float CompileTime{};
   float SkippedTime{-100.0};
+  int EditorZoom{0};
   bool Dirty{true};
   bool Compiled{true};
 };
@@ -54,7 +55,6 @@ private:
   void CompileFromEditor_() noexcept;
   void SaveShader_() noexcept;
 
-
 private:
   TextEditor editor_{};
   Rem::Shader shader_{};
@@ -65,7 +65,7 @@ private:
   Rem::Texture targetTexture_{};
   GLFWwindow *window_{};
 
-  glm::ivec2 viewportSize_{}; // Scene panel size inx px
+  glm::ivec2 viewportSize_{}; // Scene panel size in px
   glm::vec2 mouse_{};
   uint32_t vao_{};
 };

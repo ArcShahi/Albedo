@@ -1,5 +1,6 @@
 #include <App.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <format>
@@ -10,7 +11,6 @@
 #include <GlslTheme.hpp>
 
 using namespace std::string_literals;
-
 
 bool Albedo::Init() noexcept {
 
@@ -91,7 +91,7 @@ bool Albedo::Init() noexcept {
   ImGui::CreateContext();
   ImGuiIO &io{ImGui::GetIO()};
   [[maybe_unused]] ImFont *font{io.Fonts->AddFontFromFileTTF(
-      "assets/JetBrainsMonoNerdFont-Medium.ttf", 24.0f)};
+      "assets/JetBrainsMonoNerdFont-Medium.ttf", 22.0f)};
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   ImGui::StyleColorsDark();
   ImGui::GetStyle().Colors[ImGuiCol_WindowBg] =
@@ -103,7 +103,6 @@ bool Albedo::Init() noexcept {
 
 #pragma region EDITOR
 
- 
   const std::string shaderPath{"shaders/default.shader"};
   std::ifstream file(shaderPath);
   if (!file) {
@@ -215,6 +214,9 @@ void Albedo::UIRender() noexcept {
   ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
   const ImVec4 green{0.4f, 1.0f, 0.4f, 1.0f};
   const ImVec4 red{1.0f, 0.3f, 0.3f, 1.0f};
+  constexpr auto EditorFontBase{24.0f};
+  constexpr auto EditorFontStep{2.0f};
+  constexpr auto EditorMaxZoom{3};
 
 #pragma region EDITOR_PANEL
 
@@ -234,7 +236,29 @@ void Albedo::UIRender() noexcept {
     SaveShader_();
   }
 
-  editor_.Render("##Fragment"); // fills the rest of the panel
+  if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows)) {
+    const auto pressed = [](ImGuiKeyChord chord) {
+      return ImGui::IsKeyChordPressed(chord);
+    };
+
+    //
+    if (pressed(ImGuiMod_Ctrl | ImGuiKey_Equal) ||
+        pressed(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_Equal) ||
+        pressed(ImGuiMod_Ctrl | ImGuiKey_KeypadAdd))
+      editorInfo_.EditorZoom =
+          std::min(editorInfo_.EditorZoom + 1, EditorMaxZoom);
+
+    if (pressed(ImGuiMod_Ctrl | ImGuiKey_Minus) ||
+        pressed(ImGuiMod_Ctrl | ImGuiKey_KeypadSubtract))
+      editorInfo_.EditorZoom = std::max(editorInfo_.EditorZoom - 1, 0);
+
+    if (pressed(ImGuiMod_Ctrl | ImGuiKey_0))
+      editorInfo_.EditorZoom = 0;
+  }
+  ImGui::PushFont(nullptr,
+                  EditorFontBase + editorInfo_.EditorZoom * EditorFontStep);
+  editor_.Render("##Fragment");
+  ImGui::PopFont();
 
   ImGui::End();
 
@@ -275,7 +299,7 @@ void Albedo::UIRender() noexcept {
     ImGui::TextColored(red, "Shader compilation failed !!");
   }
 
-  // Shder compilation erros
+  // Shder compilation errors
   if (!shader_.Log().empty()) {
     ImGui::Separator();
     ImGui::PushStyleColor(ImGuiCol_Text, red);
@@ -296,12 +320,12 @@ void Albedo::UIRender() noexcept {
   ImVec2 sceneAvail{ImGui::GetContentRegionAvail()};
   sceneAvail.y = std::max(sceneAvail.y - sfooterY, 1.0f);
 
-  // Render target follwos the image area not whole windows
+  // Render target follows the image area not whole window
   viewportSize_ = {static_cast<int>(sceneAvail.x),
                    static_cast<int>(sceneAvail.y)};
 
-  ImDrawList *dl{ImGui::GetWindowDrawList()};
-  dl->AddCallback(
+  ImDrawList *drawList{ImGui::GetWindowDrawList()};
+  drawList->AddCallback(
       [](const ImDrawList *, const ImDrawCmd *) {
         glDisable(GL_BLEND); // ignore alpha: draw the image as opaque
       },
@@ -311,8 +335,8 @@ void Albedo::UIRender() noexcept {
   ImGui::Image((ImTextureID)(intptr_t)targetTexture_.handle, sceneAvail,
                ImVec2(0, 1), ImVec2(1, 0));
 
-  dl->AddCallback(ImDrawCallback_ResetRenderState,
-                  nullptr); // restore ImGui's state
+  // restore ImGui's state
+  drawList->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
 
   if (ImGui::IsItemHovered()) {
     const ImVec2 min{ImGui::GetItemRectMin()};
@@ -323,7 +347,7 @@ void Albedo::UIRender() noexcept {
               (1.0f - (m.y - min.y) / size.y) * targetTexture_.height};
   }
 
-  // Footer (indented because this window has zero padding)
+  // Resolution, Fps , Runtime
   ImGui::Indent(8.0f);
   ImGui::Text("%d x %d   |   %.0f FPS   |   %.2f s", targetTexture_.width,
               targetTexture_.height, ImGui::GetIO().Framerate, glfwGetTime());
@@ -366,7 +390,7 @@ void Albedo::ToggleFullscreen_() noexcept {
     glfwSetWindowMonitor(window_, monitor, 0, 0, mode->width, mode->height,
                          mode->refreshRate);
   }
-  // My fucking driver drop vsync ...
+  // My fucking driver drops vsync ...
   glfwSwapInterval(1);
 }
 
@@ -380,12 +404,12 @@ void Albedo::CompileFromEditor_() noexcept {
 
   const auto start{glfwGetTime()};
   editorInfo_.Compiled = shader_.CreateShader(editor_.GetText());
-  // compile time in seconds, seems faster
+  // compile time in seconds, looks faster
   editorInfo_.CompileTime = static_cast<float>((glfwGetTime() - start));
 
   if (editorInfo_.Compiled) {
     shader_.SetUniform("uTexture",
-                       0); // new shader program so have to add again
+                       0); // new shader program ,so have to add again
   }
 }
 
