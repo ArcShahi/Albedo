@@ -4,7 +4,6 @@
 ![Windows](https://img.shields.io/badge/Windows-tested-brightgreen?style=for-the-badge&logo=windows&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-untested-yellow?style=for-the-badge&logo=linux&logoColor=black)
 ![Issues](https://img.shields.io/github/issues/ArcShahi/Albedo?style=for-the-badge&logo=github)
-![Latest Release](https://img.shields.io/github/v/release/ArcShahi/Albedo?style=for-the-badge&logo=github)
 
 
 
@@ -17,9 +16,10 @@ Program your shader and see it changing side by side. Written in modern C++ and 
 When on editor window : 
 - Compile with F5 
 - `CTRL + S` to save 
+- `CTRL +` , `CTRL -` to increase / decrease editor font size. `CTRL + 0` to reset.
 
 >[!TIP]
-> **Run using the dedicated GPU.**
+> **Run on dedicated GPU.**
 >
 > On Windows, navigate to:
 > `Settings > System > Display > Graphics` : Custom settings for applications.
@@ -28,9 +28,9 @@ When on editor window :
 
 ## Features
 - Fast shader compilation and rendering 
-- Resizable panels : editors, scene , log 
+- Resizable panels : editors, scene , output 
 - Github like syntax highlighting and error message.
-- Dark window title bar ( I'm so proud of this ) 
+- Dark window title bar ( I'm so proud of this ) for Windows OS only.
 
 
 ## Gallery 
@@ -69,8 +69,8 @@ cmake -build out --config release
 
 
 ## Credits
-1. TheCherno: His OpenGL series has helped me a lot and I've also learned to architech software(somewhat) from him. What I had was an overengineered , overkill abomination. The app flow is much simpler now.
-1. LearnOpenGL: What a great site to learn OpenGL 
+1. **The Cherno**: His OpenGL series has helped me a lot and I've also learned to architech software(somewhat) from him. What I had was an overengineered , overkill abomination. The app flow is much simpler now.
+1. **LearnOpenGL**: What a great site to learn OpenGL 
 
 
 ## Vendors
