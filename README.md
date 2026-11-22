@@ -12,11 +12,14 @@ GLSL Fragment shader renderer and editor.
 
 Program your shader and see it changing side by side. Written in modern C++ and Modern OpenGL 4.6 Core for speed.
 
+----
 ### Usage
 When on editor window : 
 - Compile with F5 
 - `CTRL + S` to save 
 - `CTRL +` , `CTRL -` to increase / decrease editor font size. `CTRL + 0` to reset.
+
+
 
 >[!TIP]
 > **Run on dedicated GPU.**
@@ -69,7 +72,7 @@ cmake -build out --config release
 
 
 ## Credits
-1. **The Cherno**: His OpenGL series has helped me a lot and I've also learned to architech software(somewhat) from him. What I had was an overengineered , overkill abomination. The app flow is much simpler now.
+1. **The Cherno**: His OpenGL series has helped me a lot and I've also learned to architech software(somewhat) from him. What I had was an over engineered , overkill abomination. The app flow is much simpler now.
 1. **LearnOpenGL**: What a great site to learn OpenGL 
 
 
@@ -84,17 +87,16 @@ cmake -build out --config release
 
 ## AI POLICY 
 
-AI is a tool and is used as a tool to make things convinient.. not to suck the fun of art and craft.
+AI is a tool and is used as a tool for convenience in this project... not to suck the fun of art and craft. 
 
-AI usage for Code generation and documentation is forbidden for this project.
 
 ### AI usage disclosure
 
-The follwing are  LLM generated : 
+The following are  LLM generated : 
 - `dependencies.cmake` 
 - `CMakePresets.json` 
 - `GlslTheme.hpp`
-- CMLs in Vendors directories.
+- CMLs in Vendor directories.
 
 
 > Shahi ( *prefers natural stupidity over artifical intelligence*)
