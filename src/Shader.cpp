@@ -1,5 +1,4 @@
 #include <Renderer/Shader.hpp>
-#include <ErrorLog.hpp>
 
 #include <string>
 #include <string_view>
