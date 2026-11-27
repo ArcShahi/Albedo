@@ -33,8 +33,7 @@ namespace Rem {
   uint8_t *data{stbi_load(path.c_str(), &width, &height, nullptr, 4)};
 
   if (!data) {
-    Rem::LogError("Failed to load texture");
-    Rem::LogError(stbi_failure_reason());
+    Rem::Log::Error("Failed to load texture : {} ",stbi_failure_reason());
     return {};
   }
 
@@ -76,7 +75,7 @@ bool AttachTextureToFrameBuffer(FrameBuffer &framebuffer,
                                 const Texture texture) noexcept {
 
   if (!framebuffer.Handle || !texture.Handle) {
-    Rem::LogError("Invalid framebuffer or texture");
+    Rem::Log::Error("Invalid framebuffer or texture");
     return false;
   }
 
@@ -85,7 +84,7 @@ bool AttachTextureToFrameBuffer(FrameBuffer &framebuffer,
 
   if (glCheckNamedFramebufferStatus(framebuffer.Handle, GL_FRAMEBUFFER) !=
       GL_FRAMEBUFFER_COMPLETE) {
-    Rem::LogError("Framebuffer is not complete !!!");
+    Rem::Log::Error("Framebuffer is not complete !!!");
     return false;
   }
 

@@ -21,7 +21,7 @@ bool Albedo::Init() noexcept {
 #pragma region GLFW
 
   if (!glfwInit()) {
-    Rem::LogError("GLFW: Initialization failed !!");
+    Rem::Log::Error("GLFW: Failed to init");
     return false;
   }
 
@@ -32,7 +32,7 @@ bool Albedo::Init() noexcept {
   window_ = glfwCreateWindow(1920, 1080, "Albedo", nullptr, nullptr);
 
   if (!window_) {
-    Rem::LogError("GLFW: Window init failed !!");
+    Rem::Log::Error("GLFW: Window init failed !!");
     return false;
   }
 
@@ -49,7 +49,7 @@ bool Albedo::Init() noexcept {
 #pragma region OpenGL
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    Rem::LogError("GLAD: Failed to initialize !!!");
+    Rem::Log::Error("GLAD: Failed to initialize !!!");
     return false;
   }
 
@@ -65,7 +65,7 @@ bool Albedo::Init() noexcept {
   // will be sampled by shader first pass
   srcTexture_ = Rem::LoadTexture("assets/textures/albedo.png"s);
   if (!srcTexture_.Handle) {
-    Rem::LogError("Texture not loaded !!!");
+    Rem::Log::Error("Texture not loaded !!!");
   }
 
   // Frame buffer and texture target
@@ -75,7 +75,7 @@ bool Albedo::Init() noexcept {
 
   fbo_ = Rem::CreateFrameBufferWithTexture(targetTexture_);
   if (!fbo_.Handle) {
-    Rem::LogError("Framebuffer fucked");
+    Rem::Log::Error("Framebuffer fucked");
     return false;
   }
 
@@ -106,7 +106,7 @@ bool Albedo::Init() noexcept {
   const std::string shaderPath{"shaders/default.shader"};
   std::ifstream file(shaderPath);
   if (!file) {
-    Rem::LogError("Can't Open"s + shaderPath);
+    Rem::Log::Error("Can't open {}", shaderPath);
   }
 
   const std::string src{std::istreambuf_iterator<char>(file), {}};
@@ -434,6 +434,6 @@ void Albedo::SaveShader_() noexcept {
   if (out) {
     out << editor_.GetText();
   } else {
-    Rem::LogError("Couldn't write to file");
+    Rem::Log::Error("Couldn't write to file");
   }
 }

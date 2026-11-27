@@ -1,31 +1,33 @@
 #pragma once
 
-#include <iostream>
-#include <string>
+#include <cstdio>
+#include <format>
+#include <print>
+#include <string_view>
+#include <utility>
 
-namespace {
+namespace Rem::Log {
 
-constexpr auto CLEAR{"\033[0m"};
-constexpr auto RED{"\033[101m"};
-constexpr auto GREEN{"\033[102m"};
+namespace Hood {
+template <typename... Ts>
+void Write(std::FILE *out, std::string_view color, std::string_view tag,
+           std::format_string<Ts...> fmt, Ts &&...args) noexcept {
 
-} // namespace
-
-namespace Rem {
-
-// TODO: Variadic templates
-inline void LogError(const char *msg) {
-  std::cerr << RED << "[ ERROR ]: " << msg << CLEAR << '\n';
+  std::println(out, "{} [ {} ] : {}\033[0m", color, tag,
+               std::format(fmt, std::forward<Ts>(args)...));
 }
-inline void LogError(const std::string& msg) {
-  std::cerr << RED << "[ ERROR ]: " << msg << CLEAR << '\n';
-}
+} // namespace Hood
 
-inline void LogInfo(const char *msg) {
-  std::cout<< GREEN << "[ INFO ]: " << msg << CLEAR << '\n';
-}
-inline void LogInfo(const std::string& msg) {
-  std::cout << GREEN << "[ INFO ]: " << msg << CLEAR << '\n';
+
+template <typename... Ts>
+void Error(std::format_string<Ts...> fmt, Ts &&...args) {
+  Hood::Write(stderr, "\033[91m", "ERROR", fmt, std::forward<Ts>(args)...);
 }
 
-} // namespace Rem
+template <typename... Ts>
+void Info(std::format_string<Ts...> fmt, Ts &&...args) {
+  Hood::Write(stdout, "\033[92m", "INFO", fmt, std::forward<Ts>(args)...);
+}
+
+
+} // namespace Rem::Log
