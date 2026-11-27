@@ -7,10 +7,10 @@
 
 
 
-GLSL Fragment shader renderer and editor.
+GLSL Fragment shader renderer and editor with hot reloading*.
 
 
-Program your shader and see it changing side by side. Written in modern C++ and Modern OpenGL 4.6 Core for speed.
+Written in modern C++ and Modern OpenGL 4.6 Core for speed.
 
 ----
 ### Usage
@@ -30,9 +30,9 @@ When on editor window :
 > Add `albedo.exe` and set its GPU preference to **High performance**, if available.
 
 ## Features
-- Fast shader compilation and rendering 
-- Resizable panels : editors, scene , output 
-- Github like syntax highlighting and error message.
+- Fast shader compilation and rendering. 
+- Resizable panels : editors, scene , output. 
+- Github theme for text editor.
 - Dark window title bar ( I'm so proud of this ) for Windows OS only.
 
 
@@ -52,6 +52,10 @@ When on editor window :
 ![cloud](gallery/cloud.png)
 
 ## Setup
+
+If you want the editor without building it yourself then checkout the releases tab, but we warned the `.exe` is not signed so your OS will flag it. 
+
+So prefer building it yourself then you'll have more control.
 
 ```powershell
 # 1. Clone the repo
@@ -79,8 +83,7 @@ cmake -build out --config release
 ## Vendors
 
 - **GLFW** : For Window
-- **GLAD** : For OpenGL "Loader" to give us the GPU drive implemented OpenGL specification.
-- **ImGUI**: For UI
+- **GLAD** : For OpenGL "Loader". To find us the OpenGL implementation for the GPU driver. 
 - **STB**  : For texture loading 
 - **GLM**  : Why not.
 - **goossens/ImGuiColorTextEdit** : Text editor and syntax highlighting
